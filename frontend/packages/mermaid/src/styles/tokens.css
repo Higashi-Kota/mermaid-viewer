@@ -173,6 +173,9 @@
   /* Toast Colors - Dark mode */
   --toast-info-bg: oklch(0.3 0.05 250);
   --toast-info-icon: var(--mermaid-color-primary);
+
+  /* Editor - high visibility caret */
+  --editor-caret-color: oklch(0.98 0 0);
 }
 
 /* System preference fallback (when no manual selection) */
@@ -208,5 +211,8 @@
     /* Toast Colors - Dark mode */
     --toast-info-bg: oklch(0.3 0.05 250);
     --toast-info-icon: var(--mermaid-color-primary);
+
+    /* Editor - high visibility caret */
+    --editor-caret-color: oklch(0.98 0 0);
   }
 }
