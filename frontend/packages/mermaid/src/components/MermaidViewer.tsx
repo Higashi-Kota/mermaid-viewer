@@ -359,20 +359,21 @@ export function MermaidViewer({
     event.preventDefault()
     event.currentTarget.setPointerCapture(event.pointerId)
 
-    const element = contentRef.current
-    if (!element) return
-    const rect = element.getBoundingClientRect()
-    const x = event.clientX - rect.left
-    const y = event.clientY - rect.top
-
-    // Register pointer
-    activePointersRef.current.set(event.pointerId, { x, y })
+    // Register pointer with screen coordinates
+    activePointersRef.current.set(event.pointerId, {
+      x: event.clientX,
+      y: event.clientY,
+    })
 
     if (activePointersRef.current.size === 1) {
-      // Single pointer: start pan
-      store.startTouchPan({ identifier: event.pointerId, x, y })
+      // Single pointer: start pan with screen coordinates (original API)
+      store.startPan(event.clientX, event.clientY)
     } else if (activePointersRef.current.size === 2) {
-      // Two pointers: start pinch
+      // Two pointers: end pan and start pinch
+      store.endPan()
+      const element = contentRef.current
+      if (!element) return
+      const rect = element.getBoundingClientRect()
       const points = Array.from(activePointersRef.current.entries())
       const first = points[0]
       const second = points[1]
@@ -380,8 +381,8 @@ export function MermaidViewer({
         const [id1, p1] = first
         const [id2, p2] = second
         store.startPinch([
-          { identifier: id1, x: p1.x, y: p1.y },
-          { identifier: id2, x: p2.x, y: p2.y },
+          { identifier: id1, x: p1.x - rect.left, y: p1.y - rect.top },
+          { identifier: id2, x: p2.x - rect.left, y: p2.y - rect.top },
         ])
       }
     }
@@ -391,24 +392,24 @@ export function MermaidViewer({
     if (!event.currentTarget.hasPointerCapture(event.pointerId)) return
     if (!activePointersRef.current.has(event.pointerId)) return
 
-    const element = contentRef.current
-    if (!element) return
-    const rect = element.getBoundingClientRect()
-    const x = event.clientX - rect.left
-    const y = event.clientY - rect.top
-
-    // Update pointer position
-    activePointersRef.current.set(event.pointerId, { x, y })
+    // Update pointer position with screen coordinates
+    activePointersRef.current.set(event.pointerId, {
+      x: event.clientX,
+      y: event.clientY,
+    })
 
     if (activePointersRef.current.size === 1) {
-      // Single pointer: update pan
-      store.updateTouch([{ identifier: event.pointerId, x, y }], zoomConstraints)
+      // Single pointer: update pan with screen coordinates (original API)
+      store.updatePan(event.clientX, event.clientY)
     } else if (activePointersRef.current.size >= 2) {
-      // Two+ pointers: update pinch
+      // Two+ pointers: update pinch with container-relative coordinates
+      const element = contentRef.current
+      if (!element) return
+      const rect = element.getBoundingClientRect()
       const points = Array.from(activePointersRef.current.entries()).map(([id, p]) => ({
         identifier: id,
-        x: p.x,
-        y: p.y,
+        x: p.x - rect.left,
+        y: p.y - rect.top,
       }))
       store.updateTouch(points, zoomConstraints)
     }
@@ -423,14 +424,16 @@ export function MermaidViewer({
 
     if (activePointersRef.current.size === 0) {
       // All pointers released
+      store.endPan()
       store.endTouch()
     } else if (activePointersRef.current.size === 1) {
       // Pinch ended, continue with pan
+      store.endTouch()
       const entries = Array.from(activePointersRef.current.entries())
       const first = entries[0]
       if (first) {
-        const [id, p] = first
-        store.startTouchPan({ identifier: id, x: p.x, y: p.y })
+        const [, p] = first
+        store.startPan(p.x, p.y) // Screen coordinates for pan
       }
     }
   }
@@ -442,6 +445,7 @@ export function MermaidViewer({
     activePointersRef.current.delete(event.pointerId)
 
     if (activePointersRef.current.size === 0) {
+      store.endPan()
       store.endTouch()
     }
   }
@@ -452,17 +456,21 @@ export function MermaidViewer({
     event.preventDefault()
     event.currentTarget.setPointerCapture(event.pointerId)
 
-    const element = fullscreenContentRef.current
-    if (!element) return
-    const rect = element.getBoundingClientRect()
-    const x = event.clientX - rect.left
-    const y = event.clientY - rect.top
-
-    fullscreenActivePointersRef.current.set(event.pointerId, { x, y })
+    // Register pointer with screen coordinates
+    fullscreenActivePointersRef.current.set(event.pointerId, {
+      x: event.clientX,
+      y: event.clientY,
+    })
 
     if (fullscreenActivePointersRef.current.size === 1) {
-      store.startTouchPan({ identifier: event.pointerId, x, y })
+      // Single pointer: start pan with screen coordinates (original API)
+      store.startPan(event.clientX, event.clientY)
     } else if (fullscreenActivePointersRef.current.size === 2) {
+      // Two pointers: end pan and start pinch
+      store.endPan()
+      const element = fullscreenContentRef.current
+      if (!element) return
+      const rect = element.getBoundingClientRect()
       const points = Array.from(fullscreenActivePointersRef.current.entries())
       const first = points[0]
       const second = points[1]
@@ -470,8 +478,8 @@ export function MermaidViewer({
         const [id1, p1] = first
         const [id2, p2] = second
         store.startPinch([
-          { identifier: id1, x: p1.x, y: p1.y },
-          { identifier: id2, x: p2.x, y: p2.y },
+          { identifier: id1, x: p1.x - rect.left, y: p1.y - rect.top },
+          { identifier: id2, x: p2.x - rect.left, y: p2.y - rect.top },
         ])
       }
     }
@@ -481,21 +489,24 @@ export function MermaidViewer({
     if (!event.currentTarget.hasPointerCapture(event.pointerId)) return
     if (!fullscreenActivePointersRef.current.has(event.pointerId)) return
 
-    const element = fullscreenContentRef.current
-    if (!element) return
-    const rect = element.getBoundingClientRect()
-    const x = event.clientX - rect.left
-    const y = event.clientY - rect.top
-
-    fullscreenActivePointersRef.current.set(event.pointerId, { x, y })
+    // Update pointer position with screen coordinates
+    fullscreenActivePointersRef.current.set(event.pointerId, {
+      x: event.clientX,
+      y: event.clientY,
+    })
 
     if (fullscreenActivePointersRef.current.size === 1) {
-      store.updateTouch([{ identifier: event.pointerId, x, y }], zoomConstraints)
+      // Single pointer: update pan with screen coordinates (original API)
+      store.updatePan(event.clientX, event.clientY)
     } else if (fullscreenActivePointersRef.current.size >= 2) {
+      // Two+ pointers: update pinch with container-relative coordinates
+      const element = fullscreenContentRef.current
+      if (!element) return
+      const rect = element.getBoundingClientRect()
       const points = Array.from(fullscreenActivePointersRef.current.entries()).map(([id, p]) => ({
         identifier: id,
-        x: p.x,
-        y: p.y,
+        x: p.x - rect.left,
+        y: p.y - rect.top,
       }))
       store.updateTouch(points, zoomConstraints)
     }
@@ -509,13 +520,17 @@ export function MermaidViewer({
     fullscreenActivePointersRef.current.delete(event.pointerId)
 
     if (fullscreenActivePointersRef.current.size === 0) {
+      // All pointers released
+      store.endPan()
       store.endTouch()
     } else if (fullscreenActivePointersRef.current.size === 1) {
+      // Pinch ended, continue with pan
+      store.endTouch()
       const entries = Array.from(fullscreenActivePointersRef.current.entries())
       const first = entries[0]
       if (first) {
-        const [id, p] = first
-        store.startTouchPan({ identifier: id, x: p.x, y: p.y })
+        const [, p] = first
+        store.startPan(p.x, p.y) // Screen coordinates for pan
       }
     }
   }
@@ -527,6 +542,7 @@ export function MermaidViewer({
     fullscreenActivePointersRef.current.delete(event.pointerId)
 
     if (fullscreenActivePointersRef.current.size === 0) {
+      store.endPan()
       store.endTouch()
     }
   }
