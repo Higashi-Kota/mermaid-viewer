@@ -16,6 +16,36 @@ export interface ZoomConstraints {
 }
 
 /**
+ * Touch point with identifier for tracking
+ */
+export interface TouchPoint {
+  readonly identifier: number
+  readonly x: number
+  readonly y: number
+}
+
+/**
+ * Pinch gesture state for touch zoom
+ * Uses delta-based approach: stores previous frame state for accurate tracking
+ */
+export type PinchGestureState =
+  | { readonly type: "idle" }
+  | {
+      readonly type: "singleTouch"
+      readonly touch: TouchPoint
+      readonly panStartX: number
+      readonly panStartY: number
+    }
+  | {
+      readonly type: "pinch"
+      readonly touches: readonly [TouchPoint, TouchPoint]
+      /** Previous frame distance between touch points */
+      readonly prevDistance: number
+      /** Previous frame center point */
+      readonly prevCenter: { readonly x: number; readonly y: number }
+    }
+
+/**
  * Viewport bounds in content coordinates
  */
 export interface ViewportBounds {

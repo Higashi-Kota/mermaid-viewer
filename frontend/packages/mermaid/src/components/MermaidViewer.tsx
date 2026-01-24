@@ -3,6 +3,7 @@ import mermaid from "mermaid"
 import { useEffect, useRef, useState } from "react"
 
 import { exportPng, exportSvg, generateFilename } from "../core/export"
+// pinchGesture utilities used by PanZoomManager
 import { DEFAULT_ZOOM_CONSTRAINTS, toTransformCSS } from "../core/transform"
 import { parseSvgDimensions } from "../core/viewport"
 import { useMermaidStore } from "../store/useMermaidStore"
@@ -124,6 +125,10 @@ export function MermaidViewer({
   // Handler refs for wheel events (Handler Ref Pattern)
   const wheelHandlerRef = useRef<((e: WheelEvent) => void) | null>(null)
   const fullscreenWheelHandlerRef = useRef<((e: WheelEvent) => void) | null>(null)
+
+  // Active pointers for pinch zoom tracking
+  const activePointersRef = useRef<Map<number, { x: number; y: number }>>(new Map())
+  const fullscreenActivePointersRef = useRef<Map<number, { x: number; y: number }>>(new Map())
 
   // Subscribe to store
   const snapshot = useMermaidStore(store)
@@ -347,32 +352,199 @@ export function MermaidViewer({
     return () => element.removeEventListener("wheel", handler)
   }, [snapshot.isFullscreen])
 
-  // Pointer drag pan (unified touch/mouse)
+  // Pointer events for pan and pinch zoom (unified touch/mouse/pen)
   function handlePointerDown(event: React.PointerEvent) {
-    // Left click / primary touch only
+    // Left click only for mouse
     if (event.button !== 0 && event.pointerType === "mouse") return
     event.preventDefault()
     event.currentTarget.setPointerCapture(event.pointerId)
-    store.startPan(event.clientX, event.clientY)
+
+    // Register pointer with screen coordinates
+    activePointersRef.current.set(event.pointerId, {
+      x: event.clientX,
+      y: event.clientY,
+    })
+
+    if (activePointersRef.current.size === 1) {
+      // Single pointer: start pan with screen coordinates (original API)
+      store.startPan(event.clientX, event.clientY)
+    } else if (activePointersRef.current.size === 2) {
+      // Two pointers: end pan and start pinch
+      store.endPan()
+      const element = contentRef.current
+      if (!element) return
+      const rect = element.getBoundingClientRect()
+      const points = Array.from(activePointersRef.current.entries())
+      const first = points[0]
+      const second = points[1]
+      if (first && second) {
+        const [id1, p1] = first
+        const [id2, p2] = second
+        store.startPinch([
+          { identifier: id1, x: p1.x - rect.left, y: p1.y - rect.top },
+          { identifier: id2, x: p2.x - rect.left, y: p2.y - rect.top },
+        ])
+      }
+    }
   }
 
   function handlePointerMove(event: React.PointerEvent) {
     if (!event.currentTarget.hasPointerCapture(event.pointerId)) return
-    store.updatePan(event.clientX, event.clientY)
+    if (!activePointersRef.current.has(event.pointerId)) return
+
+    // Update pointer position with screen coordinates
+    activePointersRef.current.set(event.pointerId, {
+      x: event.clientX,
+      y: event.clientY,
+    })
+
+    if (activePointersRef.current.size === 1) {
+      // Single pointer: update pan with screen coordinates (original API)
+      store.updatePan(event.clientX, event.clientY)
+    } else if (activePointersRef.current.size >= 2) {
+      // Two+ pointers: update pinch with container-relative coordinates
+      const element = contentRef.current
+      if (!element) return
+      const rect = element.getBoundingClientRect()
+      const points = Array.from(activePointersRef.current.entries()).map(([id, p]) => ({
+        identifier: id,
+        x: p.x - rect.left,
+        y: p.y - rect.top,
+      }))
+      store.updateTouch(points, zoomConstraints)
+    }
   }
 
   function handlePointerUp(event: React.PointerEvent) {
     if (event.currentTarget.hasPointerCapture(event.pointerId)) {
       event.currentTarget.releasePointerCapture(event.pointerId)
     }
-    store.endPan()
+
+    activePointersRef.current.delete(event.pointerId)
+
+    if (activePointersRef.current.size === 0) {
+      // All pointers released
+      store.endPan()
+      store.endTouch()
+    } else if (activePointersRef.current.size === 1) {
+      // Pinch ended, continue with pan
+      store.endTouch()
+      const entries = Array.from(activePointersRef.current.entries())
+      const first = entries[0]
+      if (first) {
+        const [, p] = first
+        store.startPan(p.x, p.y) // Screen coordinates for pan
+      }
+    }
   }
 
   function handlePointerCancel(event: React.PointerEvent) {
     if (event.currentTarget.hasPointerCapture(event.pointerId)) {
       event.currentTarget.releasePointerCapture(event.pointerId)
     }
-    store.endPan()
+    activePointersRef.current.delete(event.pointerId)
+
+    if (activePointersRef.current.size === 0) {
+      store.endPan()
+      store.endTouch()
+    }
+  }
+
+  // Fullscreen pointer events
+  function handleFullscreenPointerDown(event: React.PointerEvent) {
+    if (event.button !== 0 && event.pointerType === "mouse") return
+    event.preventDefault()
+    event.currentTarget.setPointerCapture(event.pointerId)
+
+    // Register pointer with screen coordinates
+    fullscreenActivePointersRef.current.set(event.pointerId, {
+      x: event.clientX,
+      y: event.clientY,
+    })
+
+    if (fullscreenActivePointersRef.current.size === 1) {
+      // Single pointer: start pan with screen coordinates (original API)
+      store.startPan(event.clientX, event.clientY)
+    } else if (fullscreenActivePointersRef.current.size === 2) {
+      // Two pointers: end pan and start pinch
+      store.endPan()
+      const element = fullscreenContentRef.current
+      if (!element) return
+      const rect = element.getBoundingClientRect()
+      const points = Array.from(fullscreenActivePointersRef.current.entries())
+      const first = points[0]
+      const second = points[1]
+      if (first && second) {
+        const [id1, p1] = first
+        const [id2, p2] = second
+        store.startPinch([
+          { identifier: id1, x: p1.x - rect.left, y: p1.y - rect.top },
+          { identifier: id2, x: p2.x - rect.left, y: p2.y - rect.top },
+        ])
+      }
+    }
+  }
+
+  function handleFullscreenPointerMove(event: React.PointerEvent) {
+    if (!event.currentTarget.hasPointerCapture(event.pointerId)) return
+    if (!fullscreenActivePointersRef.current.has(event.pointerId)) return
+
+    // Update pointer position with screen coordinates
+    fullscreenActivePointersRef.current.set(event.pointerId, {
+      x: event.clientX,
+      y: event.clientY,
+    })
+
+    if (fullscreenActivePointersRef.current.size === 1) {
+      // Single pointer: update pan with screen coordinates (original API)
+      store.updatePan(event.clientX, event.clientY)
+    } else if (fullscreenActivePointersRef.current.size >= 2) {
+      // Two+ pointers: update pinch with container-relative coordinates
+      const element = fullscreenContentRef.current
+      if (!element) return
+      const rect = element.getBoundingClientRect()
+      const points = Array.from(fullscreenActivePointersRef.current.entries()).map(([id, p]) => ({
+        identifier: id,
+        x: p.x - rect.left,
+        y: p.y - rect.top,
+      }))
+      store.updateTouch(points, zoomConstraints)
+    }
+  }
+
+  function handleFullscreenPointerUp(event: React.PointerEvent) {
+    if (event.currentTarget.hasPointerCapture(event.pointerId)) {
+      event.currentTarget.releasePointerCapture(event.pointerId)
+    }
+
+    fullscreenActivePointersRef.current.delete(event.pointerId)
+
+    if (fullscreenActivePointersRef.current.size === 0) {
+      // All pointers released
+      store.endPan()
+      store.endTouch()
+    } else if (fullscreenActivePointersRef.current.size === 1) {
+      // Pinch ended, continue with pan
+      store.endTouch()
+      const entries = Array.from(fullscreenActivePointersRef.current.entries())
+      const first = entries[0]
+      if (first) {
+        const [, p] = first
+        store.startPan(p.x, p.y) // Screen coordinates for pan
+      }
+    }
+  }
+
+  function handleFullscreenPointerCancel(event: React.PointerEvent) {
+    if (event.currentTarget.hasPointerCapture(event.pointerId)) {
+      event.currentTarget.releasePointerCapture(event.pointerId)
+    }
+    fullscreenActivePointersRef.current.delete(event.pointerId)
+
+    if (fullscreenActivePointersRef.current.size === 0) {
+      store.endPan()
+      store.endTouch()
+    }
   }
 
   // Export handlers (inline functions per project guidelines - NO useCallback)
@@ -498,11 +670,11 @@ export function MermaidViewer({
           className={[styles.fullscreenContent, isPanning && styles.panning]
             .filter(Boolean)
             .join(" ")}
-          onPointerDown={handlePointerDown}
-          onPointerMove={handlePointerMove}
-          onPointerUp={handlePointerUp}
-          onPointerCancel={handlePointerCancel}
-          onPointerLeave={handlePointerUp}
+          onPointerDown={handleFullscreenPointerDown}
+          onPointerMove={handleFullscreenPointerMove}
+          onPointerUp={handleFullscreenPointerUp}
+          onPointerCancel={handleFullscreenPointerCancel}
+          onPointerLeave={handleFullscreenPointerUp}
         >
           <div
             className={styles.wrapper}
