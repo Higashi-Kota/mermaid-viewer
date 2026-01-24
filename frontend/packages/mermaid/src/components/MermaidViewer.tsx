@@ -531,6 +531,36 @@ export function MermaidViewer({
     }
   }, [snapshot.isFullscreen])
 
+  // Block iOS Safari native pinch zoom (gesturestart/gesturechange events)
+  useEffect(() => {
+    const element = contentRef.current
+    if (!element || !snapshot.svgContent) return
+
+    const preventGesture = (e: Event) => e.preventDefault()
+    element.addEventListener("gesturestart", preventGesture)
+    element.addEventListener("gesturechange", preventGesture)
+
+    return () => {
+      element.removeEventListener("gesturestart", preventGesture)
+      element.removeEventListener("gesturechange", preventGesture)
+    }
+  }, [snapshot.svgContent])
+
+  // Block iOS Safari native pinch zoom (fullscreen mode)
+  useEffect(() => {
+    const element = fullscreenContentRef.current
+    if (!element || !snapshot.isFullscreen) return
+
+    const preventGesture = (e: Event) => e.preventDefault()
+    element.addEventListener("gesturestart", preventGesture)
+    element.addEventListener("gesturechange", preventGesture)
+
+    return () => {
+      element.removeEventListener("gesturestart", preventGesture)
+      element.removeEventListener("gesturechange", preventGesture)
+    }
+  }, [snapshot.isFullscreen])
+
   // Export handlers (inline functions per project guidelines - NO useCallback)
   function handleExportSvg() {
     if (snapshot.svgContent) {
