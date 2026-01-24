@@ -1,0 +1,24 @@
+{
+  "name": "@mermaid-demo/messages",
+  "version": "0.0.1",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "typecheck": "tsgo -p tsconfig.typecheck.json"
+  },
+  "dependencies": {
+    "@mermaid-demo/i18n": "workspace:*"
+  },
+  "peerDependencies": {
+    "react": "^19.0.0"
+  },
+  "devDependencies": {
+    "@internal/shared-config": "workspace:*",
+    "@types/react": "^19.2.9",
+    "@typescript/native-preview": "^7.0.0-dev.20260122.4",
+    "typescript": "^5.9.3"
+  }
+}

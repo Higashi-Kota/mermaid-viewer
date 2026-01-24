@@ -1,0 +1,39 @@
+.switcher {
+  display: grid;
+  place-items: center;
+  min-width: var(--touch-target-min);
+  height: var(--touch-target-min);
+  padding: 0 var(--space-3);
+  border: none;
+  border-radius: var(--mermaid-radius-sm);
+  background-color: transparent;
+  color: var(--mermaid-color-fg-muted);
+  cursor: pointer;
+  touch-action: manipulation;
+  transition:
+    color var(--duration-fast),
+    background-color var(--duration-fast);
+}
+
+.switcher:hover {
+  color: var(--mermaid-color-fg);
+  background-color: var(--mermaid-color-surface-hover);
+}
+
+.switcher:focus-visible {
+  outline: 2px solid var(--mermaid-color-ring);
+  outline-offset: 2px;
+}
+
+.label {
+  font-family: var(--font-mono);
+  font-size: var(--text-sm);
+  font-weight: var(--font-semibold);
+  letter-spacing: var(--tracking-wide);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .switcher {
+    transition: none;
+  }
+}

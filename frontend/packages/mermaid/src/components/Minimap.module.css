@@ -1,0 +1,76 @@
+/* Minimap CSS Module - Touch Responsive */
+
+/* Minimap container */
+.minimap {
+  position: absolute;
+  bottom: var(--space-6, 12px);
+  right: var(--space-6, 12px);
+  z-index: var(--z-minimap, 10);
+  background-color: var(--mermaid-color-surface);
+  border: 1px solid var(--mermaid-color-border);
+  border-radius: var(--mermaid-radius-md);
+  box-shadow: var(--mermaid-shadow-float);
+  overflow: hidden;
+  cursor: pointer;
+  touch-action: none;
+  user-select: none;
+}
+
+/* Larger touch target on coarse pointer devices */
+@media (hover: none) and (pointer: coarse) {
+  .minimap {
+    transform: scale(1.1);
+    transform-origin: bottom right;
+  }
+}
+
+.dragging {
+  cursor: grabbing;
+}
+
+/* SVG content container */
+.content {
+  opacity: 0.7;
+}
+
+.content svg {
+  display: block;
+  width: 100% !important;
+  height: 100% !important;
+  max-width: none !important;
+}
+
+/* Viewport indicator */
+.viewport {
+  position: absolute;
+  border: 2px solid var(--mermaid-color-primary);
+  background-color: rgba(59, 130, 246, 0.2);
+  border-radius: 2px;
+  pointer-events: auto;
+  cursor: grab;
+  transition: border-color var(--duration-fast, 150ms);
+}
+
+/* More visible border on touch devices */
+@media (hover: none) and (pointer: coarse) {
+  .viewport {
+    border-width: 3px;
+  }
+}
+
+.viewport:hover {
+  border-color: var(--mermaid-color-primary-hover);
+}
+
+.dragging .viewport,
+.viewport:active {
+  cursor: grabbing;
+  border-color: var(--mermaid-color-primary-active);
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .viewport {
+    transition: none;
+  }
+}

@@ -1,0 +1,7 @@
+{
+  "$schema": "https://biomejs.dev/schemas/2.3.11/schema.json",
+  "extends": ["@internal/shared-config/biome"],
+  "files": {
+    "includes": ["!**/*.css.d.ts"]
+  }
+}

@@ -1,0 +1,64 @@
+/* ZoomControls CSS Module - Touch Responsive */
+
+/* Controls container - Grid layout */
+.controls {
+  position: absolute;
+  bottom: var(--space-6, 12px);
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: var(--z-controls, 10);
+  display: grid;
+  grid-auto-flow: column;
+  align-items: center;
+  gap: var(--space-2, 4px);
+  background-color: var(--mermaid-color-surface);
+  border: 1px solid var(--mermaid-color-border);
+  border-radius: var(--mermaid-radius-md);
+  padding: var(--space-2, 4px) var(--space-4, 8px);
+  box-shadow: var(--mermaid-shadow-float);
+}
+
+/* Zoom button - WCAG 2.5.5 AAA touch target */
+.btn {
+  display: grid;
+  place-items: center;
+  min-width: var(--touch-target-min, 44px);
+  min-height: var(--touch-target-min, 44px);
+  border: none;
+  border-radius: var(--mermaid-radius-sm);
+  background-color: transparent;
+  color: var(--mermaid-color-fg);
+  cursor: pointer;
+  touch-action: manipulation;
+  transition: background-color var(--duration-fast, 150ms);
+}
+
+.btn:hover {
+  background-color: var(--mermaid-color-surface-hover);
+}
+
+.btn:focus-visible {
+  outline: 2px solid var(--mermaid-color-ring);
+  outline-offset: -2px;
+}
+
+.btn:active {
+  background-color: var(--mermaid-color-surface-hover);
+}
+
+/* Zoom info display */
+.info {
+  min-width: 48px;
+  text-align: center;
+  font-size: var(--text-sm, 12px);
+  color: var(--mermaid-color-fg-muted);
+  user-select: none;
+  padding: 0 var(--space-2, 4px);
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .btn {
+    transition: none;
+  }
+}

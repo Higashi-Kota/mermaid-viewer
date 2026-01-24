@@ -1,0 +1,34 @@
+{
+  "name": "@mermaid-demo/mermaid",
+  "version": "0.0.1",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts",
+    "./styles": "./src/styles/tokens.css"
+  },
+  "scripts": {
+    "dev": "tcm src/components --watch",
+    "typecheck": "tsgo -p tsconfig.typecheck.json",
+    "css:types": "tcm src/components",
+    "css:types:watch": "tcm src/components --watch"
+  },
+  "dependencies": {
+    "html-to-image": "^1.11.13",
+    "lucide-react": "^0.563.0",
+    "mermaid": "^11.12.2",
+    "ts-pattern": "^5.9.0"
+  },
+  "peerDependencies": {
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0"
+  },
+  "devDependencies": {
+    "@internal/shared-config": "workspace:*",
+    "@types/react": "^19.2.9",
+    "@types/react-dom": "^19.2.3",
+    "@typescript/native-preview": "^7.0.0-dev.20260122.4",
+    "typed-css-modules": "^0.9.1",
+    "typescript": "^5.9.3"
+  }
+}

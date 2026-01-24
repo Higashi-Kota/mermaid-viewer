@@ -1,0 +1,4 @@
+{
+  "extends": "@internal/shared-config/tsconfig/base",
+  "exclude": ["node_modules", "dist"]
+}

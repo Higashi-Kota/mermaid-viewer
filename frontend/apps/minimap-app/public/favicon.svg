@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
+  <defs>
+    <linearGradient id="grad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#6366f1"/>
+      <stop offset="100%" style="stop-color:#8b5cf6"/>
+    </linearGradient>
+    <linearGradient id="node" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#fbbf24"/>
+      <stop offset="100%" style="stop-color:#f59e0b"/>
+    </linearGradient>
+  </defs>
+  <!-- Background rounded square -->
+  <rect x="1" y="1" width="30" height="30" rx="6" fill="url(#grad)"/>
+  <!-- Flowchart nodes -->
+  <rect x="5" y="5" width="8" height="5" rx="1" fill="url(#node)"/>
+  <rect x="19" y="5" width="8" height="5" rx="1" fill="url(#node)"/>
+  <rect x="12" y="14" width="8" height="5" rx="1" fill="url(#node)"/>
+  <rect x="5" y="23" width="8" height="5" rx="1" fill="url(#node)"/>
+  <rect x="19" y="23" width="8" height="5" rx="1" fill="url(#node)"/>
+  <!-- Connection lines -->
+  <path d="M9 10 L9 12 L16 12 L16 14" stroke="white" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+  <path d="M23 10 L23 12 L16 12" stroke="white" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+  <path d="M16 19 L16 21 L9 21 L9 23" stroke="white" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+  <path d="M16 19 L16 21 L23 21 L23 23" stroke="white" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+</svg>

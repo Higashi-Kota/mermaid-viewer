@@ -1,0 +1,33 @@
+{
+  "name": "@mermaid-demo/minimap-app",
+  "version": "0.0.1",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "concurrently \"tcm src --watch\" \"vite\"",
+    "build": "vite build",
+    "preview": "vite preview",
+    "typecheck": "tsc -p tsconfig.typecheck.json",
+    "css:types": "tcm src",
+    "css:types:watch": "tcm src --watch"
+  },
+  "dependencies": {
+    "@mermaid-demo/i18n": "workspace:*",
+    "@mermaid-demo/mermaid": "workspace:*",
+    "@mermaid-demo/messages": "workspace:*",
+    "lucide-react": "^0.563.0",
+    "react": "^19.2.3",
+    "react-dom": "^19.2.3"
+  },
+  "devDependencies": {
+    "@internal/shared-config": "workspace:*",
+    "@types/node": "^25.0.10",
+    "@types/react": "^19.2.9",
+    "@types/react-dom": "^19.2.3",
+    "@vitejs/plugin-react": "^5.1.2",
+    "concurrently": "^9.2.1",
+    "typed-css-modules": "^0.9.1",
+    "typescript": "^5.9.3",
+    "vite": "^7.3.1"
+  }
+}

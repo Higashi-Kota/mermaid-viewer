@@ -1,0 +1,69 @@
+/* FullscreenOverlay CSS Module */
+
+/* Overlay container - Grid layout */
+.overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  background-color: var(--mermaid-color-surface);
+  display: grid;
+  grid-template-rows: auto 1fr;
+}
+
+/* Header - Grid layout for space-between */
+.header {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: center;
+  padding: 12px 20px;
+  background-color: var(--mermaid-color-surface-subtle);
+  border-bottom: 1px solid var(--mermaid-color-border);
+}
+
+.title {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--mermaid-color-fg);
+}
+
+/* Header actions - Grid for gap-based layout */
+.actions {
+  display: grid;
+  grid-auto-flow: column;
+  gap: 12px;
+  align-items: center;
+}
+
+/* Close button */
+.closeBtn {
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  border: none;
+  border-radius: var(--mermaid-radius-sm);
+  background-color: transparent;
+  color: var(--mermaid-color-fg-muted);
+  cursor: pointer;
+  transition:
+    background-color 0.15s,
+    color 0.15s;
+}
+
+.closeBtn:hover {
+  background-color: var(--mermaid-color-surface-hover);
+  color: var(--mermaid-color-fg);
+}
+
+.closeBtn:focus-visible {
+  outline: 2px solid var(--mermaid-color-ring);
+  outline-offset: 2px;
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .closeBtn {
+    transition: none;
+  }
+}
