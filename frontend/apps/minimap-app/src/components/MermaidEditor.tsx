@@ -84,6 +84,12 @@ export function MermaidEditor({
         caretColor: "var(--editor-caret-color)",
         padding: "var(--space-2) 0",
       },
+      ".cm-cursor": {
+        borderLeftColor: "var(--editor-caret-color)",
+      },
+      ".cm-dropCursor": {
+        borderLeftColor: "var(--editor-caret-color)",
+      },
       ".cm-line": {
         paddingLeft: "var(--space-2)",
         paddingRight: "var(--space-2)",

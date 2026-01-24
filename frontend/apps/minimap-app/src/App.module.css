@@ -80,9 +80,14 @@
   place-items: center;
   width: var(--touch-target-min);
   height: var(--touch-target-min);
+  padding: 0;
+  border: none;
   border-radius: var(--mermaid-radius-sm);
+  background-color: transparent;
   color: var(--mermaid-color-fg-muted);
   text-decoration: none;
+  cursor: pointer;
+  touch-action: manipulation;
   transition:
     color var(--duration-fast),
     background-color var(--duration-fast);
