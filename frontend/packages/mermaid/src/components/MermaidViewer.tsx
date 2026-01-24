@@ -487,7 +487,8 @@ export function MermaidViewer({
     },
   }
 
-  // Register touch events with passive: false (inline mode)
+  // Register touch events with passive: false, capture: true (inline mode)
+  // Use capture phase to intercept events before SVG elements consume them
   useEffect(() => {
     const element = contentRef.current
     if (!element || !snapshot.svgContent) return
@@ -496,20 +497,21 @@ export function MermaidViewer({
     const onTouchMove = (e: TouchEvent) => touchHandlerRef.current?.handleTouchMove(e)
     const onTouchEnd = (e: TouchEvent) => touchHandlerRef.current?.handleTouchEnd(e)
 
-    element.addEventListener("touchstart", onTouchStart, { passive: false })
-    element.addEventListener("touchmove", onTouchMove, { passive: false })
-    element.addEventListener("touchend", onTouchEnd, { passive: false })
-    element.addEventListener("touchcancel", onTouchEnd, { passive: false })
+    // capture: true ensures we get the event before child elements
+    element.addEventListener("touchstart", onTouchStart, { passive: false, capture: true })
+    element.addEventListener("touchmove", onTouchMove, { passive: false, capture: true })
+    element.addEventListener("touchend", onTouchEnd, { passive: false, capture: true })
+    element.addEventListener("touchcancel", onTouchEnd, { passive: false, capture: true })
 
     return () => {
-      element.removeEventListener("touchstart", onTouchStart)
-      element.removeEventListener("touchmove", onTouchMove)
-      element.removeEventListener("touchend", onTouchEnd)
-      element.removeEventListener("touchcancel", onTouchEnd)
+      element.removeEventListener("touchstart", onTouchStart, { capture: true })
+      element.removeEventListener("touchmove", onTouchMove, { capture: true })
+      element.removeEventListener("touchend", onTouchEnd, { capture: true })
+      element.removeEventListener("touchcancel", onTouchEnd, { capture: true })
     }
   }, [snapshot.svgContent])
 
-  // Register touch events with passive: false (fullscreen mode)
+  // Register touch events with passive: false, capture: true (fullscreen mode)
   useEffect(() => {
     const element = fullscreenContentRef.current
     if (!element || !snapshot.isFullscreen) return
@@ -518,16 +520,16 @@ export function MermaidViewer({
     const onTouchMove = (e: TouchEvent) => fullscreenTouchHandlerRef.current?.handleTouchMove(e)
     const onTouchEnd = (e: TouchEvent) => fullscreenTouchHandlerRef.current?.handleTouchEnd(e)
 
-    element.addEventListener("touchstart", onTouchStart, { passive: false })
-    element.addEventListener("touchmove", onTouchMove, { passive: false })
-    element.addEventListener("touchend", onTouchEnd, { passive: false })
-    element.addEventListener("touchcancel", onTouchEnd, { passive: false })
+    element.addEventListener("touchstart", onTouchStart, { passive: false, capture: true })
+    element.addEventListener("touchmove", onTouchMove, { passive: false, capture: true })
+    element.addEventListener("touchend", onTouchEnd, { passive: false, capture: true })
+    element.addEventListener("touchcancel", onTouchEnd, { passive: false, capture: true })
 
     return () => {
-      element.removeEventListener("touchstart", onTouchStart)
-      element.removeEventListener("touchmove", onTouchMove)
-      element.removeEventListener("touchend", onTouchEnd)
-      element.removeEventListener("touchcancel", onTouchEnd)
+      element.removeEventListener("touchstart", onTouchStart, { capture: true })
+      element.removeEventListener("touchmove", onTouchMove, { capture: true })
+      element.removeEventListener("touchend", onTouchEnd, { capture: true })
+      element.removeEventListener("touchcancel", onTouchEnd, { capture: true })
     }
   }, [snapshot.isFullscreen])
 
@@ -537,12 +539,12 @@ export function MermaidViewer({
     if (!element || !snapshot.svgContent) return
 
     const preventGesture = (e: Event) => e.preventDefault()
-    element.addEventListener("gesturestart", preventGesture)
-    element.addEventListener("gesturechange", preventGesture)
+    element.addEventListener("gesturestart", preventGesture, { capture: true })
+    element.addEventListener("gesturechange", preventGesture, { capture: true })
 
     return () => {
-      element.removeEventListener("gesturestart", preventGesture)
-      element.removeEventListener("gesturechange", preventGesture)
+      element.removeEventListener("gesturestart", preventGesture, { capture: true })
+      element.removeEventListener("gesturechange", preventGesture, { capture: true })
     }
   }, [snapshot.svgContent])
 
@@ -552,12 +554,12 @@ export function MermaidViewer({
     if (!element || !snapshot.isFullscreen) return
 
     const preventGesture = (e: Event) => e.preventDefault()
-    element.addEventListener("gesturestart", preventGesture)
-    element.addEventListener("gesturechange", preventGesture)
+    element.addEventListener("gesturestart", preventGesture, { capture: true })
+    element.addEventListener("gesturechange", preventGesture, { capture: true })
 
     return () => {
-      element.removeEventListener("gesturestart", preventGesture)
-      element.removeEventListener("gesturechange", preventGesture)
+      element.removeEventListener("gesturestart", preventGesture, { capture: true })
+      element.removeEventListener("gesturechange", preventGesture, { capture: true })
     }
   }, [snapshot.isFullscreen])
 
