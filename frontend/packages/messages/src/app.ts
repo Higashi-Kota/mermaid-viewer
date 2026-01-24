@@ -78,4 +78,10 @@ export const appMessages = {
     ja: "URLで共有されたカスタム図です。",
     en: "A custom diagram shared via URL.",
   },
+
+  // PWA Update
+  "pwa.updateAvailable": { ja: "アップデートがあります", en: "Update available" },
+  "pwa.newFeatures": { ja: "新機能が利用できます", en: "New features available" },
+  "pwa.updateNow": { ja: "今すぐ更新", en: "Update now" },
+  "pwa.later": { ja: "後で", en: "Later" },
 } as const satisfies Record<string, Record<Language, string>>

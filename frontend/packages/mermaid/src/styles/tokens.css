@@ -107,6 +107,13 @@
   --z-minimap: 10;
   --z-drawer: 100;
   --z-drawer-backdrop: 99;
+  --z-toast: 200;
+
+  /* =============================================
+   * Toast Colors
+   * ============================================= */
+  --toast-info-bg: oklch(0.95 0.04 250);
+  --toast-info-icon: var(--mermaid-color-primary);
 
   /* =============================================
    * Editor Tokens
@@ -162,6 +169,10 @@
   /* Shadows - increased opacity for visibility */
   --mermaid-shadow-float: 0 4px 12px oklch(0 0 0 / 0.35);
   --mermaid-shadow-hover: 0 4px 12px oklch(0 0 0 / 0.25);
+
+  /* Toast Colors - Dark mode */
+  --toast-info-bg: oklch(0.3 0.05 250);
+  --toast-info-icon: var(--mermaid-color-primary);
 }
 
 /* System preference fallback (when no manual selection) */
@@ -193,5 +204,9 @@
     /* Shadows - increased opacity for visibility */
     --mermaid-shadow-float: 0 4px 12px oklch(0 0 0 / 0.35);
     --mermaid-shadow-hover: 0 4px 12px oklch(0 0 0 / 0.25);
+
+    /* Toast Colors - Dark mode */
+    --toast-info-bg: oklch(0.3 0.05 250);
+    --toast-info-icon: var(--mermaid-color-primary);
   }
 }

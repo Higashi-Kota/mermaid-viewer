@@ -1,0 +1,75 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630">
+  <defs>
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#6366f1"/>
+      <stop offset="100%" style="stop-color:#8b5cf6"/>
+    </linearGradient>
+    <linearGradient id="nodeGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#fbbf24"/>
+      <stop offset="100%" style="stop-color:#f59e0b"/>
+    </linearGradient>
+    <!-- Subtle pattern overlay -->
+    <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
+      <path d="M 40 0 L 0 0 0 40" fill="none" stroke="rgba(255,255,255,0.03)" stroke-width="1"/>
+    </pattern>
+  </defs>
+
+  <!-- Background -->
+  <rect width="1200" height="630" fill="url(#bgGrad)"/>
+  <rect width="1200" height="630" fill="url(#grid)"/>
+
+  <!-- Decorative flowchart elements (background) -->
+  <g opacity="0.1">
+    <!-- Top right decoration -->
+    <rect x="900" y="50" width="60" height="35" rx="6" fill="white"/>
+    <rect x="1020" y="50" width="60" height="35" rx="6" fill="white"/>
+    <rect x="960" y="120" width="60" height="35" rx="6" fill="white"/>
+    <path d="M930 85 L930 100 L990 100 L990 120" stroke="white" stroke-width="2" fill="none"/>
+    <path d="M1050 85 L1050 100 L990 100" stroke="white" stroke-width="2" fill="none"/>
+
+    <!-- Bottom left decoration -->
+    <rect x="80" y="480" width="50" height="30" rx="5" fill="white"/>
+    <rect x="160" y="480" width="50" height="30" rx="5" fill="white"/>
+    <rect x="120" y="540" width="50" height="30" rx="5" fill="white"/>
+    <path d="M105 510 L105 525 L145 525 L145 540" stroke="white" stroke-width="2" fill="none"/>
+    <path d="M185 510 L185 525 L145 525" stroke="white" stroke-width="2" fill="none"/>
+  </g>
+
+  <!-- Main Logo Area (scaled favicon design) -->
+  <g transform="translate(100, 165)">
+    <!-- Logo background -->
+    <rect x="0" y="0" width="200" height="200" rx="40" fill="rgba(255,255,255,0.15)"/>
+
+    <!-- Flowchart nodes - scaled up from favicon -->
+    <g transform="translate(25, 25) scale(4.7)">
+      <rect x="5" y="5" width="8" height="5" rx="1" fill="url(#nodeGrad)"/>
+      <rect x="19" y="5" width="8" height="5" rx="1" fill="url(#nodeGrad)"/>
+      <rect x="12" y="14" width="8" height="5" rx="1" fill="url(#nodeGrad)"/>
+      <rect x="5" y="23" width="8" height="5" rx="1" fill="url(#nodeGrad)"/>
+      <rect x="19" y="23" width="8" height="5" rx="1" fill="url(#nodeGrad)"/>
+      <!-- Connection lines -->
+      <path d="M9 10 L9 12 L16 12 L16 14" stroke="white" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+      <path d="M23 10 L23 12 L16 12" stroke="white" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+      <path d="M16 19 L16 21 L9 21 L9 23" stroke="white" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+      <path d="M16 19 L16 21 L23 21 L23 23" stroke="white" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+    </g>
+  </g>
+
+  <!-- Title text -->
+  <text x="360" y="240" font-family="system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="72" font-weight="700" fill="white">Mermaid Viewer</text>
+
+  <!-- Underline decoration -->
+  <rect x="360" y="260" width="500" height="4" rx="2" fill="url(#nodeGrad)"/>
+
+  <!-- Subtitle Japanese -->
+  <text x="360" y="320" font-family="system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Hiragino Sans', 'Yu Gothic', sans-serif" font-size="32" fill="rgba(255,255,255,0.95)">インタラクティブ図表ビューワー</text>
+
+  <!-- Features -->
+  <text x="360" y="380" font-family="system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Hiragino Sans', 'Yu Gothic', sans-serif" font-size="24" fill="rgba(255,255,255,0.8)">ミニマップ・パン&amp;ズーム・ピンチ操作対応</text>
+
+  <!-- URL footer -->
+  <g transform="translate(600, 560)">
+    <rect x="-200" y="-25" width="400" height="40" rx="20" fill="rgba(255,255,255,0.1)"/>
+    <text x="0" y="5" font-family="'SF Mono', 'Fira Code', Consolas, monospace" font-size="18" fill="rgba(255,255,255,0.7)" text-anchor="middle">higashi-kota.github.io/mermaid-viewer</text>
+  </g>
+</svg>

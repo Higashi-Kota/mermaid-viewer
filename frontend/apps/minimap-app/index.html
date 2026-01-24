@@ -1,14 +1,113 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ja">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <meta name="theme-color" content="#6366f1" />
-    <title>Minimap Demo - Mermaid Viewer</title>
+
+    <!-- Primary Meta Tags -->
+    <title>Mermaid Viewer - インタラクティブ図表ビューワー</title>
+    <meta name="title" content="Mermaid Viewer - インタラクティブ図表ビューワー" />
+    <meta name="description" content="ミニマップ、パン＆ズーム機能を備えたMermaid図表ビューワー。フローチャート、シーケンス図、クラス図など25種類以上の図表をインタラクティブに表示。" />
+    <meta name="keywords" content="mermaid, diagram, flowchart, sequence diagram, viewer, minimap, visualization, フローチャート, シーケンス図, ダイアグラム" />
+    <meta name="author" content="Higashi-Kota" />
+    <meta name="robots" content="index, follow" />
+    <meta name="googlebot" content="index, follow" />
+
+    <!-- Canonical URL -->
+    <link rel="canonical" href="https://higashi-kota.github.io/mermaid-viewer/" />
+
+    <!-- Theme Color -->
+    <meta name="theme-color" content="#6366f1" media="(prefers-color-scheme: light)" />
+    <meta name="theme-color" content="#4f46e5" media="(prefers-color-scheme: dark)" />
+    <meta name="color-scheme" content="light dark" />
+
+    <!-- Mobile App -->
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="Mermaid Viewer" />
+    <meta name="application-name" content="Mermaid Viewer" />
+
+    <!-- Microsoft -->
+    <meta name="msapplication-TileColor" content="#6366f1" />
+
+    <!-- Open Graph / Facebook / Slack / Discord / LinkedIn -->
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://higashi-kota.github.io/mermaid-viewer/" />
+    <meta property="og:title" content="Mermaid Viewer - インタラクティブ図表ビューワー" />
+    <meta property="og:description" content="ミニマップ、パン＆ズーム機能を備えたMermaid図表ビューワー。フローチャート、シーケンス図、クラス図など25種類以上の図表をインタラクティブに表示。" />
+    <meta property="og:image" content="https://higashi-kota.github.io/mermaid-viewer/og-image.png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="Mermaid Viewer - インタラクティブ図表ビューワー" />
+    <meta property="og:site_name" content="Mermaid Viewer" />
+    <meta property="og:locale" content="ja_JP" />
+    <meta property="og:locale:alternate" content="en_US" />
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:url" content="https://higashi-kota.github.io/mermaid-viewer/" />
+    <meta name="twitter:title" content="Mermaid Viewer - インタラクティブ図表ビューワー" />
+    <meta name="twitter:description" content="ミニマップ、パン＆ズーム機能を備えたMermaid図表ビューワー。フローチャート、シーケンス図など25種類以上の図表を表示。" />
+    <meta name="twitter:image" content="https://higashi-kota.github.io/mermaid-viewer/og-image.png" />
+    <meta name="twitter:image:alt" content="Mermaid Viewer - インタラクティブ図表ビューワー" />
+
+    <!-- Favicons -->
+    <link rel="icon" type="image/svg+xml" href="%BASE_URL%favicon.svg" />
+    <link rel="icon" type="image/png" sizes="32x32" href="%BASE_URL%favicon-32x32.png" />
+    <link rel="icon" type="image/png" sizes="16x16" href="%BASE_URL%favicon-16x16.png" />
+    <link rel="apple-touch-icon" sizes="180x180" href="%BASE_URL%apple-touch-icon.png" />
+    <link rel="mask-icon" href="%BASE_URL%safari-pinned-tab.svg" color="#6366f1" />
+
+    <!-- PWA Manifest (injected by vite-plugin-pwa) -->
+
     <!-- Google Fonts preconnect -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+
+    <!-- DNS Prefetch for performance -->
+    <link rel="dns-prefetch" href="https://fonts.googleapis.com" />
+
+    <!-- Structured Data (JSON-LD) -->
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "WebApplication",
+        "name": "Mermaid Viewer",
+        "alternateName": "Mermaidビューワー",
+        "description": "ミニマップ、パン＆ズーム機能を備えたMermaid図表ビューワー。フローチャート、シーケンス図、クラス図など25種類以上の図表をインタラクティブに表示。",
+        "url": "https://higashi-kota.github.io/mermaid-viewer/",
+        "applicationCategory": "DeveloperApplication",
+        "operatingSystem": "Any",
+        "browserRequirements": "Requires JavaScript. Requires HTML5.",
+        "author": {
+          "@type": "Person",
+          "name": "Higashi-Kota",
+          "url": "https://github.com/Higashi-Kota"
+        },
+        "offers": {
+          "@type": "Offer",
+          "price": "0",
+          "priceCurrency": "JPY"
+        },
+        "image": "https://higashi-kota.github.io/mermaid-viewer/og-image.png",
+        "screenshot": "https://higashi-kota.github.io/mermaid-viewer/og-image.png",
+        "featureList": [
+          "インタラクティブなMermaid図表レンダリング",
+          "ミニマップナビゲーション",
+          "パン＆ズームコントロール",
+          "ピンチ操作対応",
+          "ダーク/ライトテーマ",
+          "日英多言語対応",
+          "共有URL生成"
+        ],
+        "inLanguage": ["ja", "en"],
+        "isAccessibleForFree": true,
+        "sameAs": [
+          "https://github.com/Higashi-Kota/mermaid-viewer"
+        ]
+      }
+    </script>
   </head>
   <body>
     <div id="root"></div>

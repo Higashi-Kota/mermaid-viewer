@@ -6,6 +6,7 @@ import styles from "./App.module.css"
 import { HorizontalSplitter } from "./components/HorizontalSplitter"
 import { LanguageSwitcher } from "./components/LanguageSwitcher"
 import { MermaidEditor } from "./components/MermaidEditor"
+import { PWAUpdatePrompt } from "./components/PWAUpdatePrompt"
 import { ShareButton } from "./components/ShareButton"
 import { ThemeToggle } from "./components/ThemeToggle"
 import { createCustomDiagram, type DiagramDefinition, SAMPLE_DIAGRAMS } from "./diagrams"
@@ -313,6 +314,9 @@ export function App() {
           </div>
         </aside>
       </main>
+
+      {/* PWA Update Prompt */}
+      <PWAUpdatePrompt />
     </div>
   )
 }
