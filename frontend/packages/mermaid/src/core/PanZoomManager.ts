@@ -1,4 +1,11 @@
-import type { SvgDimensions, TransformState, ZoomConstraints } from "../types"
+import type {
+  PinchGestureState,
+  SvgDimensions,
+  TouchPoint,
+  TransformState,
+  ZoomConstraints,
+} from "../types"
+import { calculatePinchZoom, center, distance, IDLE_PINCH_STATE } from "./pinchGesture"
 import { createInitialTransform, DEFAULT_ZOOM_CONSTRAINTS, zoomAtPoint } from "./transform"
 
 /**
@@ -10,6 +17,7 @@ interface PanZoomState {
   readonly panStart: { readonly x: number; readonly y: number }
   readonly viewportSize: { readonly width: number; readonly height: number }
   readonly initialTransform: TransformState | null
+  readonly pinchGesture: PinchGestureState
 }
 
 const EMPTY_STATE: PanZoomState = {
@@ -18,6 +26,7 @@ const EMPTY_STATE: PanZoomState = {
   panStart: { x: 0, y: 0 },
   viewportSize: { width: 0, height: 0 },
   initialTransform: null,
+  pinchGesture: IDLE_PINCH_STATE,
 }
 
 /**
@@ -59,6 +68,7 @@ export class PanZoomManager {
       panStart: { x: 0, y: 0 },
       viewportSize: { width: viewportWidth, height: viewportHeight },
       initialTransform: transform,
+      pinchGesture: IDLE_PINCH_STATE,
     })
   }
 
@@ -120,6 +130,13 @@ export class PanZoomManager {
    */
   get panY(): number {
     return this._state.transform.panY
+  }
+
+  /**
+   * ピンチジェスチャー状態
+   */
+  get pinchGesture(): PinchGestureState {
+    return this._state.pinchGesture
   }
 
   // ========================================
@@ -270,6 +287,107 @@ export class PanZoomManager {
   }
 
   // ========================================
+  // Touch Operations (Pinch Zoom)
+  // ========================================
+
+  /**
+   * シングルタッチパン開始
+   */
+  startTouchPan(touch: TouchPoint): PanZoomManager {
+    return new PanZoomManager({
+      ...this._state,
+      pinchGesture: {
+        type: "singleTouch",
+        touch,
+        panStartX: touch.x - this._state.transform.panX,
+        panStartY: touch.y - this._state.transform.panY,
+      },
+    })
+  }
+
+  /**
+   * ピンチ開始（2本指）
+   */
+  startPinch(touches: readonly [TouchPoint, TouchPoint]): PanZoomManager {
+    const dist = distance(touches[0], touches[1])
+    const c = center(touches[0], touches[1])
+    return new PanZoomManager({
+      ...this._state,
+      pinchGesture: {
+        type: "pinch",
+        touches,
+        initialDistance: dist,
+        initialZoom: this._state.transform.zoom,
+        center: c,
+      },
+    })
+  }
+
+  /**
+   * タッチ移動更新
+   */
+  updateTouch(
+    touches: readonly TouchPoint[],
+    constraints: ZoomConstraints = DEFAULT_ZOOM_CONSTRAINTS,
+  ): PanZoomManager {
+    const gesture = this._state.pinchGesture
+
+    // シングルタッチパン
+    const touch0 = touches[0]
+    const touch1 = touches[1]
+    if (gesture.type === "singleTouch" && touch0 && touches.length === 1) {
+      return new PanZoomManager({
+        ...this._state,
+        transform: {
+          ...this._state.transform,
+          panX: touch0.x - gesture.panStartX,
+          panY: touch0.y - gesture.panStartY,
+        },
+      })
+    }
+
+    // ピンチズーム
+    if (gesture.type === "pinch" && touch0 && touch1 && touches.length >= 2) {
+      const newTouches: readonly [TouchPoint, TouchPoint] = [touch0, touch1]
+      const { factor, center: newCenter } = calculatePinchZoom(gesture, newTouches, constraints)
+
+      // ピンチ中心点でズーム
+      const newTransform = zoomAtPoint(
+        { ...this._state.transform, zoom: gesture.initialZoom },
+        factor,
+        newCenter.x,
+        newCenter.y,
+        constraints,
+      )
+
+      return new PanZoomManager({
+        ...this._state,
+        transform: newTransform,
+        pinchGesture: {
+          ...gesture,
+          touches: newTouches,
+          center: newCenter,
+        },
+      })
+    }
+
+    return this
+  }
+
+  /**
+   * タッチ終了
+   */
+  endTouch(): PanZoomManager {
+    if (this._state.pinchGesture.type === "idle") {
+      return this
+    }
+    return new PanZoomManager({
+      ...this._state,
+      pinchGesture: IDLE_PINCH_STATE,
+    })
+  }
+
+  // ========================================
   // Comparison
   // ========================================
 
@@ -294,7 +412,8 @@ export class PanZoomManager {
       s1.viewportSize.height === s2.viewportSize.height &&
       s1.initialTransform?.zoom === s2.initialTransform?.zoom &&
       s1.initialTransform?.panX === s2.initialTransform?.panX &&
-      s1.initialTransform?.panY === s2.initialTransform?.panY
+      s1.initialTransform?.panY === s2.initialTransform?.panY &&
+      s1.pinchGesture.type === s2.pinchGesture.type
     )
   }
 }

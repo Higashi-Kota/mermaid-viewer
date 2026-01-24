@@ -3,6 +3,7 @@ import mermaid from "mermaid"
 import { useEffect, useRef, useState } from "react"
 
 import { exportPng, exportSvg, generateFilename } from "../core/export"
+import { touchListToPoints } from "../core/pinchGesture"
 import { DEFAULT_ZOOM_CONSTRAINTS, toTransformCSS } from "../core/transform"
 import { parseSvgDimensions } from "../core/viewport"
 import { useMermaidStore } from "../store/useMermaidStore"
@@ -124,6 +125,18 @@ export function MermaidViewer({
   // Handler refs for wheel events (Handler Ref Pattern)
   const wheelHandlerRef = useRef<((e: WheelEvent) => void) | null>(null)
   const fullscreenWheelHandlerRef = useRef<((e: WheelEvent) => void) | null>(null)
+
+  // Handler refs for touch events (Handler Ref Pattern)
+  const touchHandlerRef = useRef<{
+    handleTouchStart: (e: TouchEvent) => void
+    handleTouchMove: (e: TouchEvent) => void
+    handleTouchEnd: (e: TouchEvent) => void
+  } | null>(null)
+  const fullscreenTouchHandlerRef = useRef<{
+    handleTouchStart: (e: TouchEvent) => void
+    handleTouchMove: (e: TouchEvent) => void
+    handleTouchEnd: (e: TouchEvent) => void
+  } | null>(null)
 
   // Subscribe to store
   const snapshot = useMermaidStore(store)
@@ -347,9 +360,11 @@ export function MermaidViewer({
     return () => element.removeEventListener("wheel", handler)
   }, [snapshot.isFullscreen])
 
-  // Pointer drag pan (unified touch/mouse)
+  // Pointer drag pan (mouse/pen only - touch is handled by TouchEvents for pinch support)
   function handlePointerDown(event: React.PointerEvent) {
-    // Left click / primary touch only
+    // Skip touch - handled by TouchEvents for pinch zoom support
+    if (event.pointerType === "touch") return
+    // Left click only for mouse
     if (event.button !== 0 && event.pointerType === "mouse") return
     event.preventDefault()
     event.currentTarget.setPointerCapture(event.pointerId)
@@ -357,11 +372,13 @@ export function MermaidViewer({
   }
 
   function handlePointerMove(event: React.PointerEvent) {
+    if (event.pointerType === "touch") return
     if (!event.currentTarget.hasPointerCapture(event.pointerId)) return
     store.updatePan(event.clientX, event.clientY)
   }
 
   function handlePointerUp(event: React.PointerEvent) {
+    if (event.pointerType === "touch") return
     if (event.currentTarget.hasPointerCapture(event.pointerId)) {
       event.currentTarget.releasePointerCapture(event.pointerId)
     }
@@ -369,11 +386,150 @@ export function MermaidViewer({
   }
 
   function handlePointerCancel(event: React.PointerEvent) {
+    if (event.pointerType === "touch") return
     if (event.currentTarget.hasPointerCapture(event.pointerId)) {
       event.currentTarget.releasePointerCapture(event.pointerId)
     }
     store.endPan()
   }
+
+  // Touch event handlers - Handler Ref Pattern (inline mode)
+  // Always access latest store/zoomConstraints
+  touchHandlerRef.current = {
+    handleTouchStart: (e: TouchEvent) => {
+      e.preventDefault()
+      const element = contentRef.current
+      if (!element) return
+
+      const rect = element.getBoundingClientRect()
+      const touches = touchListToPoints(e.touches, rect)
+
+      const touch0 = touches[0]
+      const touch1 = touches[1]
+      if (touch0 && touch1) {
+        store.startPinch([touch0, touch1])
+      } else if (touch0) {
+        store.startTouchPan(touch0)
+      }
+    },
+
+    handleTouchMove: (e: TouchEvent) => {
+      e.preventDefault()
+      const element = contentRef.current
+      if (!element) return
+
+      const rect = element.getBoundingClientRect()
+      const touches = touchListToPoints(e.touches, rect)
+      store.updateTouch(touches, zoomConstraints)
+    },
+
+    handleTouchEnd: (e: TouchEvent) => {
+      e.preventDefault()
+      const element = contentRef.current
+      if (!element) return
+
+      const rect = element.getBoundingClientRect()
+      const touches = touchListToPoints(e.touches, rect)
+      const touch0 = touches[0]
+
+      if (touches.length === 0) {
+        store.endTouch()
+      } else if (touch0) {
+        // Pinch ended, continue with single touch pan
+        store.startTouchPan(touch0)
+      }
+    },
+  }
+
+  // Touch event handlers (fullscreen mode)
+  fullscreenTouchHandlerRef.current = {
+    handleTouchStart: (e: TouchEvent) => {
+      e.preventDefault()
+      const element = fullscreenContentRef.current
+      if (!element) return
+
+      const rect = element.getBoundingClientRect()
+      const touches = touchListToPoints(e.touches, rect)
+      const touch0 = touches[0]
+      const touch1 = touches[1]
+
+      if (touch0 && touch1) {
+        store.startPinch([touch0, touch1])
+      } else if (touch0) {
+        store.startTouchPan(touch0)
+      }
+    },
+
+    handleTouchMove: (e: TouchEvent) => {
+      e.preventDefault()
+      const element = fullscreenContentRef.current
+      if (!element) return
+
+      const rect = element.getBoundingClientRect()
+      const touches = touchListToPoints(e.touches, rect)
+      store.updateTouch(touches, zoomConstraints)
+    },
+
+    handleTouchEnd: (e: TouchEvent) => {
+      e.preventDefault()
+      const element = fullscreenContentRef.current
+      if (!element) return
+
+      const rect = element.getBoundingClientRect()
+      const touches = touchListToPoints(e.touches, rect)
+      const touch0 = touches[0]
+
+      if (touches.length === 0) {
+        store.endTouch()
+      } else if (touch0) {
+        store.startTouchPan(touch0)
+      }
+    },
+  }
+
+  // Register touch events with passive: false (inline mode)
+  useEffect(() => {
+    const element = contentRef.current
+    if (!element || !snapshot.svgContent) return
+
+    const onTouchStart = (e: TouchEvent) => touchHandlerRef.current?.handleTouchStart(e)
+    const onTouchMove = (e: TouchEvent) => touchHandlerRef.current?.handleTouchMove(e)
+    const onTouchEnd = (e: TouchEvent) => touchHandlerRef.current?.handleTouchEnd(e)
+
+    element.addEventListener("touchstart", onTouchStart, { passive: false })
+    element.addEventListener("touchmove", onTouchMove, { passive: false })
+    element.addEventListener("touchend", onTouchEnd, { passive: false })
+    element.addEventListener("touchcancel", onTouchEnd, { passive: false })
+
+    return () => {
+      element.removeEventListener("touchstart", onTouchStart)
+      element.removeEventListener("touchmove", onTouchMove)
+      element.removeEventListener("touchend", onTouchEnd)
+      element.removeEventListener("touchcancel", onTouchEnd)
+    }
+  }, [snapshot.svgContent])
+
+  // Register touch events with passive: false (fullscreen mode)
+  useEffect(() => {
+    const element = fullscreenContentRef.current
+    if (!element || !snapshot.isFullscreen) return
+
+    const onTouchStart = (e: TouchEvent) => fullscreenTouchHandlerRef.current?.handleTouchStart(e)
+    const onTouchMove = (e: TouchEvent) => fullscreenTouchHandlerRef.current?.handleTouchMove(e)
+    const onTouchEnd = (e: TouchEvent) => fullscreenTouchHandlerRef.current?.handleTouchEnd(e)
+
+    element.addEventListener("touchstart", onTouchStart, { passive: false })
+    element.addEventListener("touchmove", onTouchMove, { passive: false })
+    element.addEventListener("touchend", onTouchEnd, { passive: false })
+    element.addEventListener("touchcancel", onTouchEnd, { passive: false })
+
+    return () => {
+      element.removeEventListener("touchstart", onTouchStart)
+      element.removeEventListener("touchmove", onTouchMove)
+      element.removeEventListener("touchend", onTouchEnd)
+      element.removeEventListener("touchcancel", onTouchEnd)
+    }
+  }, [snapshot.isFullscreen])
 
   // Export handlers (inline functions per project guidelines - NO useCallback)
   function handleExportSvg() {

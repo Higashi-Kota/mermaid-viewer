@@ -16,6 +16,34 @@ export interface ZoomConstraints {
 }
 
 /**
+ * Touch point with identifier for tracking
+ */
+export interface TouchPoint {
+  readonly identifier: number
+  readonly x: number
+  readonly y: number
+}
+
+/**
+ * Pinch gesture state for touch zoom
+ */
+export type PinchGestureState =
+  | { readonly type: "idle" }
+  | {
+      readonly type: "singleTouch"
+      readonly touch: TouchPoint
+      readonly panStartX: number
+      readonly panStartY: number
+    }
+  | {
+      readonly type: "pinch"
+      readonly touches: readonly [TouchPoint, TouchPoint]
+      readonly initialDistance: number
+      readonly initialZoom: number
+      readonly center: { readonly x: number; readonly y: number }
+    }
+
+/**
  * Viewport bounds in content coordinates
  */
 export interface ViewportBounds {

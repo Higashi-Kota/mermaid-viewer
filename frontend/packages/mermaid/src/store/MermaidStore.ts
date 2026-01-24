@@ -1,6 +1,6 @@
 import { PanZoomManager } from "../core/PanZoomManager"
 import { RenderStateManager } from "../core/RenderStateManager"
-import type { SvgDimensions, TransformState, ZoomConstraints } from "../types"
+import type { SvgDimensions, TouchPoint, TransformState, ZoomConstraints } from "../types"
 
 /**
  * MermaidStore のスナップショット
@@ -240,6 +240,48 @@ export class MermaidStore {
    */
   endPan(): void {
     const newPanZoom = this._panZoom.endPan()
+    if (newPanZoom !== this._panZoom) {
+      this._panZoom = newPanZoom
+      this.notify()
+    }
+  }
+
+  // ==========================================
+  // Touch Operations (Pinch Zoom)
+  // ==========================================
+
+  /**
+   * シングルタッチパン開始
+   */
+  startTouchPan(touch: TouchPoint): void {
+    this._panZoom = this._panZoom.startTouchPan(touch)
+    this.notify()
+  }
+
+  /**
+   * ピンチ開始（2本指）
+   */
+  startPinch(touches: readonly [TouchPoint, TouchPoint]): void {
+    this._panZoom = this._panZoom.startPinch(touches)
+    this.notify()
+  }
+
+  /**
+   * タッチ移動更新
+   */
+  updateTouch(touches: readonly TouchPoint[], constraints?: ZoomConstraints): void {
+    const newPanZoom = this._panZoom.updateTouch(touches, constraints)
+    if (newPanZoom !== this._panZoom) {
+      this._panZoom = newPanZoom
+      this.notify()
+    }
+  }
+
+  /**
+   * タッチ終了
+   */
+  endTouch(): void {
+    const newPanZoom = this._panZoom.endTouch()
     if (newPanZoom !== this._panZoom) {
       this._panZoom = newPanZoom
       this.notify()
