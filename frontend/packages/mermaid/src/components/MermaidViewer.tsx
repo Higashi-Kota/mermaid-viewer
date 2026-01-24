@@ -3,7 +3,7 @@ import mermaid from "mermaid"
 import { useEffect, useRef, useState } from "react"
 
 import { exportPng, exportSvg, generateFilename } from "../core/export"
-import { touchListToPoints } from "../core/pinchGesture"
+// pinchGesture utilities used by PanZoomManager
 import { DEFAULT_ZOOM_CONSTRAINTS, toTransformCSS } from "../core/transform"
 import { parseSvgDimensions } from "../core/viewport"
 import { useMermaidStore } from "../store/useMermaidStore"
@@ -126,17 +126,9 @@ export function MermaidViewer({
   const wheelHandlerRef = useRef<((e: WheelEvent) => void) | null>(null)
   const fullscreenWheelHandlerRef = useRef<((e: WheelEvent) => void) | null>(null)
 
-  // Handler refs for touch events (Handler Ref Pattern)
-  const touchHandlerRef = useRef<{
-    handleTouchStart: (e: TouchEvent) => void
-    handleTouchMove: (e: TouchEvent) => void
-    handleTouchEnd: (e: TouchEvent) => void
-  } | null>(null)
-  const fullscreenTouchHandlerRef = useRef<{
-    handleTouchStart: (e: TouchEvent) => void
-    handleTouchMove: (e: TouchEvent) => void
-    handleTouchEnd: (e: TouchEvent) => void
-  } | null>(null)
+  // Active pointers for pinch zoom tracking
+  const activePointersRef = useRef<Map<number, { x: number; y: number }>>(new Map())
+  const fullscreenActivePointersRef = useRef<Map<number, { x: number; y: number }>>(new Map())
 
   // Subscribe to store
   const snapshot = useMermaidStore(store)
@@ -360,208 +352,184 @@ export function MermaidViewer({
     return () => element.removeEventListener("wheel", handler)
   }, [snapshot.isFullscreen])
 
-  // Pointer drag pan (mouse/pen only - touch is handled by TouchEvents for pinch support)
+  // Pointer events for pan and pinch zoom (unified touch/mouse/pen)
   function handlePointerDown(event: React.PointerEvent) {
-    // Skip touch - handled by TouchEvents for pinch zoom support
-    if (event.pointerType === "touch") return
     // Left click only for mouse
     if (event.button !== 0 && event.pointerType === "mouse") return
     event.preventDefault()
     event.currentTarget.setPointerCapture(event.pointerId)
-    store.startPan(event.clientX, event.clientY)
+
+    const element = contentRef.current
+    if (!element) return
+    const rect = element.getBoundingClientRect()
+    const x = event.clientX - rect.left
+    const y = event.clientY - rect.top
+
+    // Register pointer
+    activePointersRef.current.set(event.pointerId, { x, y })
+
+    if (activePointersRef.current.size === 1) {
+      // Single pointer: start pan
+      store.startTouchPan({ identifier: event.pointerId, x, y })
+    } else if (activePointersRef.current.size === 2) {
+      // Two pointers: start pinch
+      const points = Array.from(activePointersRef.current.entries())
+      const first = points[0]
+      const second = points[1]
+      if (first && second) {
+        const [id1, p1] = first
+        const [id2, p2] = second
+        store.startPinch([
+          { identifier: id1, x: p1.x, y: p1.y },
+          { identifier: id2, x: p2.x, y: p2.y },
+        ])
+      }
+    }
   }
 
   function handlePointerMove(event: React.PointerEvent) {
-    if (event.pointerType === "touch") return
     if (!event.currentTarget.hasPointerCapture(event.pointerId)) return
-    store.updatePan(event.clientX, event.clientY)
+    if (!activePointersRef.current.has(event.pointerId)) return
+
+    const element = contentRef.current
+    if (!element) return
+    const rect = element.getBoundingClientRect()
+    const x = event.clientX - rect.left
+    const y = event.clientY - rect.top
+
+    // Update pointer position
+    activePointersRef.current.set(event.pointerId, { x, y })
+
+    if (activePointersRef.current.size === 1) {
+      // Single pointer: update pan
+      store.updateTouch([{ identifier: event.pointerId, x, y }], zoomConstraints)
+    } else if (activePointersRef.current.size >= 2) {
+      // Two+ pointers: update pinch
+      const points = Array.from(activePointersRef.current.entries()).map(([id, p]) => ({
+        identifier: id,
+        x: p.x,
+        y: p.y,
+      }))
+      store.updateTouch(points, zoomConstraints)
+    }
   }
 
   function handlePointerUp(event: React.PointerEvent) {
-    if (event.pointerType === "touch") return
     if (event.currentTarget.hasPointerCapture(event.pointerId)) {
       event.currentTarget.releasePointerCapture(event.pointerId)
     }
-    store.endPan()
+
+    activePointersRef.current.delete(event.pointerId)
+
+    if (activePointersRef.current.size === 0) {
+      // All pointers released
+      store.endTouch()
+    } else if (activePointersRef.current.size === 1) {
+      // Pinch ended, continue with pan
+      const entries = Array.from(activePointersRef.current.entries())
+      const first = entries[0]
+      if (first) {
+        const [id, p] = first
+        store.startTouchPan({ identifier: id, x: p.x, y: p.y })
+      }
+    }
   }
 
   function handlePointerCancel(event: React.PointerEvent) {
-    if (event.pointerType === "touch") return
     if (event.currentTarget.hasPointerCapture(event.pointerId)) {
       event.currentTarget.releasePointerCapture(event.pointerId)
     }
-    store.endPan()
-  }
+    activePointersRef.current.delete(event.pointerId)
 
-  // Touch event handlers - Handler Ref Pattern (inline mode)
-  // Always access latest store/zoomConstraints
-  touchHandlerRef.current = {
-    handleTouchStart: (e: TouchEvent) => {
-      e.preventDefault()
-      const element = contentRef.current
-      if (!element) return
-
-      const rect = element.getBoundingClientRect()
-      const touches = touchListToPoints(e.touches, rect)
-
-      const touch0 = touches[0]
-      const touch1 = touches[1]
-      if (touch0 && touch1) {
-        store.startPinch([touch0, touch1])
-      } else if (touch0) {
-        store.startTouchPan(touch0)
-      }
-    },
-
-    handleTouchMove: (e: TouchEvent) => {
-      e.preventDefault()
-      const element = contentRef.current
-      if (!element) return
-
-      const rect = element.getBoundingClientRect()
-      const touches = touchListToPoints(e.touches, rect)
-      store.updateTouch(touches, zoomConstraints)
-    },
-
-    handleTouchEnd: (e: TouchEvent) => {
-      e.preventDefault()
-      const element = contentRef.current
-      if (!element) return
-
-      const rect = element.getBoundingClientRect()
-      const touches = touchListToPoints(e.touches, rect)
-      const touch0 = touches[0]
-
-      if (touches.length === 0) {
-        store.endTouch()
-      } else if (touch0) {
-        // Pinch ended, continue with single touch pan
-        store.startTouchPan(touch0)
-      }
-    },
-  }
-
-  // Touch event handlers (fullscreen mode)
-  fullscreenTouchHandlerRef.current = {
-    handleTouchStart: (e: TouchEvent) => {
-      e.preventDefault()
-      const element = fullscreenContentRef.current
-      if (!element) return
-
-      const rect = element.getBoundingClientRect()
-      const touches = touchListToPoints(e.touches, rect)
-      const touch0 = touches[0]
-      const touch1 = touches[1]
-
-      if (touch0 && touch1) {
-        store.startPinch([touch0, touch1])
-      } else if (touch0) {
-        store.startTouchPan(touch0)
-      }
-    },
-
-    handleTouchMove: (e: TouchEvent) => {
-      e.preventDefault()
-      const element = fullscreenContentRef.current
-      if (!element) return
-
-      const rect = element.getBoundingClientRect()
-      const touches = touchListToPoints(e.touches, rect)
-      store.updateTouch(touches, zoomConstraints)
-    },
-
-    handleTouchEnd: (e: TouchEvent) => {
-      e.preventDefault()
-      const element = fullscreenContentRef.current
-      if (!element) return
-
-      const rect = element.getBoundingClientRect()
-      const touches = touchListToPoints(e.touches, rect)
-      const touch0 = touches[0]
-
-      if (touches.length === 0) {
-        store.endTouch()
-      } else if (touch0) {
-        store.startTouchPan(touch0)
-      }
-    },
-  }
-
-  // Register touch events with passive: false, capture: true (inline mode)
-  // Use capture phase to intercept events before SVG elements consume them
-  useEffect(() => {
-    const element = contentRef.current
-    if (!element || !snapshot.svgContent) return
-
-    const onTouchStart = (e: TouchEvent) => touchHandlerRef.current?.handleTouchStart(e)
-    const onTouchMove = (e: TouchEvent) => touchHandlerRef.current?.handleTouchMove(e)
-    const onTouchEnd = (e: TouchEvent) => touchHandlerRef.current?.handleTouchEnd(e)
-
-    // capture: true ensures we get the event before child elements
-    element.addEventListener("touchstart", onTouchStart, { passive: false, capture: true })
-    element.addEventListener("touchmove", onTouchMove, { passive: false, capture: true })
-    element.addEventListener("touchend", onTouchEnd, { passive: false, capture: true })
-    element.addEventListener("touchcancel", onTouchEnd, { passive: false, capture: true })
-
-    return () => {
-      element.removeEventListener("touchstart", onTouchStart, { capture: true })
-      element.removeEventListener("touchmove", onTouchMove, { capture: true })
-      element.removeEventListener("touchend", onTouchEnd, { capture: true })
-      element.removeEventListener("touchcancel", onTouchEnd, { capture: true })
+    if (activePointersRef.current.size === 0) {
+      store.endTouch()
     }
-  }, [snapshot.svgContent])
+  }
 
-  // Register touch events with passive: false, capture: true (fullscreen mode)
-  useEffect(() => {
+  // Fullscreen pointer events
+  function handleFullscreenPointerDown(event: React.PointerEvent) {
+    if (event.button !== 0 && event.pointerType === "mouse") return
+    event.preventDefault()
+    event.currentTarget.setPointerCapture(event.pointerId)
+
     const element = fullscreenContentRef.current
-    if (!element || !snapshot.isFullscreen) return
+    if (!element) return
+    const rect = element.getBoundingClientRect()
+    const x = event.clientX - rect.left
+    const y = event.clientY - rect.top
 
-    const onTouchStart = (e: TouchEvent) => fullscreenTouchHandlerRef.current?.handleTouchStart(e)
-    const onTouchMove = (e: TouchEvent) => fullscreenTouchHandlerRef.current?.handleTouchMove(e)
-    const onTouchEnd = (e: TouchEvent) => fullscreenTouchHandlerRef.current?.handleTouchEnd(e)
+    fullscreenActivePointersRef.current.set(event.pointerId, { x, y })
 
-    element.addEventListener("touchstart", onTouchStart, { passive: false, capture: true })
-    element.addEventListener("touchmove", onTouchMove, { passive: false, capture: true })
-    element.addEventListener("touchend", onTouchEnd, { passive: false, capture: true })
-    element.addEventListener("touchcancel", onTouchEnd, { passive: false, capture: true })
-
-    return () => {
-      element.removeEventListener("touchstart", onTouchStart, { capture: true })
-      element.removeEventListener("touchmove", onTouchMove, { capture: true })
-      element.removeEventListener("touchend", onTouchEnd, { capture: true })
-      element.removeEventListener("touchcancel", onTouchEnd, { capture: true })
+    if (fullscreenActivePointersRef.current.size === 1) {
+      store.startTouchPan({ identifier: event.pointerId, x, y })
+    } else if (fullscreenActivePointersRef.current.size === 2) {
+      const points = Array.from(fullscreenActivePointersRef.current.entries())
+      const first = points[0]
+      const second = points[1]
+      if (first && second) {
+        const [id1, p1] = first
+        const [id2, p2] = second
+        store.startPinch([
+          { identifier: id1, x: p1.x, y: p1.y },
+          { identifier: id2, x: p2.x, y: p2.y },
+        ])
+      }
     }
-  }, [snapshot.isFullscreen])
+  }
 
-  // Block iOS Safari native pinch zoom (gesturestart/gesturechange events)
-  useEffect(() => {
-    const element = contentRef.current
-    if (!element || !snapshot.svgContent) return
+  function handleFullscreenPointerMove(event: React.PointerEvent) {
+    if (!event.currentTarget.hasPointerCapture(event.pointerId)) return
+    if (!fullscreenActivePointersRef.current.has(event.pointerId)) return
 
-    const preventGesture = (e: Event) => e.preventDefault()
-    element.addEventListener("gesturestart", preventGesture, { capture: true })
-    element.addEventListener("gesturechange", preventGesture, { capture: true })
-
-    return () => {
-      element.removeEventListener("gesturestart", preventGesture, { capture: true })
-      element.removeEventListener("gesturechange", preventGesture, { capture: true })
-    }
-  }, [snapshot.svgContent])
-
-  // Block iOS Safari native pinch zoom (fullscreen mode)
-  useEffect(() => {
     const element = fullscreenContentRef.current
-    if (!element || !snapshot.isFullscreen) return
+    if (!element) return
+    const rect = element.getBoundingClientRect()
+    const x = event.clientX - rect.left
+    const y = event.clientY - rect.top
 
-    const preventGesture = (e: Event) => e.preventDefault()
-    element.addEventListener("gesturestart", preventGesture, { capture: true })
-    element.addEventListener("gesturechange", preventGesture, { capture: true })
+    fullscreenActivePointersRef.current.set(event.pointerId, { x, y })
 
-    return () => {
-      element.removeEventListener("gesturestart", preventGesture, { capture: true })
-      element.removeEventListener("gesturechange", preventGesture, { capture: true })
+    if (fullscreenActivePointersRef.current.size === 1) {
+      store.updateTouch([{ identifier: event.pointerId, x, y }], zoomConstraints)
+    } else if (fullscreenActivePointersRef.current.size >= 2) {
+      const points = Array.from(fullscreenActivePointersRef.current.entries()).map(([id, p]) => ({
+        identifier: id,
+        x: p.x,
+        y: p.y,
+      }))
+      store.updateTouch(points, zoomConstraints)
     }
-  }, [snapshot.isFullscreen])
+  }
+
+  function handleFullscreenPointerUp(event: React.PointerEvent) {
+    if (event.currentTarget.hasPointerCapture(event.pointerId)) {
+      event.currentTarget.releasePointerCapture(event.pointerId)
+    }
+
+    fullscreenActivePointersRef.current.delete(event.pointerId)
+
+    if (fullscreenActivePointersRef.current.size === 0) {
+      store.endTouch()
+    } else if (fullscreenActivePointersRef.current.size === 1) {
+      const entries = Array.from(fullscreenActivePointersRef.current.entries())
+      const first = entries[0]
+      if (first) {
+        const [id, p] = first
+        store.startTouchPan({ identifier: id, x: p.x, y: p.y })
+      }
+    }
+  }
+
+  function handleFullscreenPointerCancel(event: React.PointerEvent) {
+    if (event.currentTarget.hasPointerCapture(event.pointerId)) {
+      event.currentTarget.releasePointerCapture(event.pointerId)
+    }
+    fullscreenActivePointersRef.current.delete(event.pointerId)
+
+    if (fullscreenActivePointersRef.current.size === 0) {
+      store.endTouch()
+    }
+  }
 
   // Export handlers (inline functions per project guidelines - NO useCallback)
   function handleExportSvg() {
@@ -686,11 +654,11 @@ export function MermaidViewer({
           className={[styles.fullscreenContent, isPanning && styles.panning]
             .filter(Boolean)
             .join(" ")}
-          onPointerDown={handlePointerDown}
-          onPointerMove={handlePointerMove}
-          onPointerUp={handlePointerUp}
-          onPointerCancel={handlePointerCancel}
-          onPointerLeave={handlePointerUp}
+          onPointerDown={handleFullscreenPointerDown}
+          onPointerMove={handleFullscreenPointerMove}
+          onPointerUp={handleFullscreenPointerUp}
+          onPointerCancel={handleFullscreenPointerCancel}
+          onPointerLeave={handleFullscreenPointerUp}
         >
           <div
             className={styles.wrapper}
