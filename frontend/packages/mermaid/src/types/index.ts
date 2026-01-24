@@ -26,6 +26,7 @@ export interface TouchPoint {
 
 /**
  * Pinch gesture state for touch zoom
+ * Uses delta-based approach: stores previous frame state for accurate tracking
  */
 export type PinchGestureState =
   | { readonly type: "idle" }
@@ -38,9 +39,10 @@ export type PinchGestureState =
   | {
       readonly type: "pinch"
       readonly touches: readonly [TouchPoint, TouchPoint]
-      readonly initialDistance: number
-      readonly initialZoom: number
-      readonly center: { readonly x: number; readonly y: number }
+      /** Previous frame distance between touch points */
+      readonly prevDistance: number
+      /** Previous frame center point */
+      readonly prevCenter: { readonly x: number; readonly y: number }
     }
 
 /**

@@ -307,6 +307,7 @@ export class PanZoomManager {
 
   /**
    * ピンチ開始（2本指）
+   * Delta-based: stores previous frame state for accurate tracking
    */
   startPinch(touches: readonly [TouchPoint, TouchPoint]): PanZoomManager {
     const dist = distance(touches[0], touches[1])
@@ -316,9 +317,8 @@ export class PanZoomManager {
       pinchGesture: {
         type: "pinch",
         touches,
-        initialDistance: dist,
-        initialZoom: this._state.transform.zoom,
-        center: c,
+        prevDistance: dist,
+        prevCenter: c,
       },
     })
   }
@@ -346,27 +346,24 @@ export class PanZoomManager {
       })
     }
 
-    // ピンチズーム
+    // ピンチズーム（デルタベース）
     if (gesture.type === "pinch" && touch0 && touch1 && touches.length >= 2) {
       const newTouches: readonly [TouchPoint, TouchPoint] = [touch0, touch1]
-      const { factor, center: newCenter } = calculatePinchZoom(gesture, newTouches, constraints)
-
-      // ピンチ中心点でズーム
-      const newTransform = zoomAtPoint(
-        { ...this._state.transform, zoom: gesture.initialZoom },
-        factor,
-        newCenter.x,
-        newCenter.y,
+      const { transform, newCenter, newDistance } = calculatePinchZoom(
+        gesture,
+        newTouches,
+        this._state.transform,
         constraints,
       )
 
       return new PanZoomManager({
         ...this._state,
-        transform: newTransform,
+        transform,
         pinchGesture: {
-          ...gesture,
+          type: "pinch",
           touches: newTouches,
-          center: newCenter,
+          prevDistance: newDistance,
+          prevCenter: newCenter,
         },
       })
     }
