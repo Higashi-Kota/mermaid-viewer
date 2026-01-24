@@ -515,3 +515,15 @@ export const SAMPLE_DIAGRAMS: readonly DiagramDefinition[] = [
 export function getDiagramById(id: string): DiagramDefinition | undefined {
   return SAMPLE_DIAGRAMS.find((d) => d.id === id)
 }
+
+/**
+ * Creates a custom diagram definition (used when restoring from URL)
+ */
+export function createCustomDiagram(definition: string): DiagramDefinition {
+  return {
+    id: "custom",
+    nameKey: "diagram.custom.name",
+    descriptionKey: "diagram.custom.description",
+    definition,
+  }
+}

@@ -107,6 +107,30 @@
   --z-minimap: 10;
   --z-drawer: 100;
   --z-drawer-backdrop: 99;
+
+  /* =============================================
+   * Editor Tokens
+   * ============================================= */
+  --editor-gutter-bg: var(--mermaid-color-surface-subtle);
+  --editor-gutter-border: var(--mermaid-color-border);
+  --editor-gutter-text: var(--mermaid-color-fg-muted);
+  --editor-line-number-width: 3.5rem;
+  --editor-caret-color: var(--mermaid-color-primary);
+  --editor-selection-bg: oklch(from var(--mermaid-color-primary) l c h / 0.2);
+  --editor-active-line-bg: oklch(from var(--mermaid-color-primary) l c h / 0.08);
+  --editor-error-bg: var(--mermaid-color-destructive-subtle);
+  --editor-error-border: var(--mermaid-color-destructive);
+  --editor-error-text: var(--mermaid-color-destructive);
+
+  /* =============================================
+   * Resizer Tokens
+   * ============================================= */
+  --resizer-width: 6px;
+  --resizer-handle-height: 40px;
+  --resizer-bg: var(--mermaid-color-border);
+  --resizer-bg-hover: var(--mermaid-color-primary);
+  --resizer-indicator: var(--mermaid-color-fg-muted);
+  --resizer-indicator-active: white;
 }
 
 /* Dark mode - Manual toggle via data-theme attribute */

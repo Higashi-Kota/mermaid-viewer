@@ -67,4 +67,15 @@ export const appMessages = {
 
   // GitHub
   "github.repository": { ja: "GitHubリポジトリ", en: "GitHub repository" },
+
+  // Share
+  "share.button": { ja: "共有リンクをコピー", en: "Copy share link" },
+  "share.copied": { ja: "コピーしました！", en: "Link copied!" },
+
+  // Custom diagram (loaded from URL)
+  "diagram.custom.name": { ja: "カスタム図", en: "Custom Diagram" },
+  "diagram.custom.description": {
+    ja: "URLで共有されたカスタム図です。",
+    en: "A custom diagram shared via URL.",
+  },
 } as const satisfies Record<string, Record<Language, string>>

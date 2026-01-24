@@ -564,12 +564,25 @@
 }
 
 /* =============================================
+ * Editor Pane (Desktop only)
+ * ============================================= */
+.editorPane {
+  height: 100%;
+  display: grid;
+  grid-template-rows: 1fr;
+  overflow: hidden;
+  padding: var(--space-4);
+  background-color: var(--mermaid-color-surface-subtle);
+}
+
+/* =============================================
  * Viewer Area
  * ============================================= */
 .viewerArea {
+  height: 100%;
   position: relative;
   padding: var(--space-4);
-  overflow: auto;
+  overflow: hidden;
   background-color: var(--mermaid-color-surface);
 }
 

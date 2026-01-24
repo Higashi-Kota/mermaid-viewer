@@ -1,31 +1,59 @@
 import { MermaidStore, MermaidViewer, useMermaidStore } from "@mermaid-demo/mermaid"
 import { useAppTranslation } from "@mermaid-demo/messages"
 import { Github, Info, Menu, X } from "lucide-react"
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import styles from "./App.module.css"
+import { HorizontalSplitter } from "./components/HorizontalSplitter"
 import { LanguageSwitcher } from "./components/LanguageSwitcher"
+import { MermaidEditor } from "./components/MermaidEditor"
+import { ShareButton } from "./components/ShareButton"
 import { ThemeToggle } from "./components/ThemeToggle"
-import { type DiagramDefinition, SAMPLE_DIAGRAMS } from "./diagrams"
+import { createCustomDiagram, type DiagramDefinition, SAMPLE_DIAGRAMS } from "./diagrams"
 import { useIsMobile } from "./hooks/useMediaQuery"
+import { getInitialShareState, useShareUrl } from "./hooks/useShareUrl"
 
 // Create store at module level (following project guidelines)
 const mermaidStore = MermaidStore.create()
 
+// Get initial state from URL (before component mounts)
+const initialShareState = getInitialShareState()
+
 export function App() {
-  const [selectedDiagram, setSelectedDiagram] = useState<DiagramDefinition>(SAMPLE_DIAGRAMS[0])
+  const [selectedDiagram, setSelectedDiagram] = useState<DiagramDefinition>(() =>
+    initialShareState ? createCustomDiagram(initialShareState.definition) : SAMPLE_DIAGRAMS[0],
+  )
+  const [editorContent, setEditorContent] = useState<string>(() =>
+    initialShareState ? initialShareState.definition : SAMPLE_DIAGRAMS[0].definition,
+  )
   const [isInfoDrawerOpen, setIsInfoDrawerOpen] = useState(false)
   const [isDiagramDrawerOpen, setIsDiagramDrawerOpen] = useState(false)
   const snapshot = useMermaidStore(mermaidStore)
   const isMobile = useIsMobile()
   const { t } = useAppTranslation()
+  const { clearUrlParams } = useShareUrl()
+
+  // Clear URL params after loading from share URL
+  useEffect(() => {
+    if (initialShareState) {
+      clearUrlParams()
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [clearUrlParams])
 
   // Inline handlers - NO useCallback (following project guidelines)
   function handleDiagramSelect(diagram: DiagramDefinition) {
     // Skip if same diagram is selected
     if (selectedDiagram.id === diagram.id) return
     setSelectedDiagram(diagram)
+    setEditorContent(diagram.definition)
     // Reset the store when switching diagrams
     mermaidStore.reset()
+  }
+
+  function handleEditorChange(value: string) {
+    setEditorContent(value)
+    // MermaidViewer automatically re-renders when definition prop changes
+    // The cancelled flag pattern in MermaidViewer handles rapid changes gracefully
   }
 
   function handleFullscreenChange(_isFullscreen: boolean) {
@@ -85,6 +113,7 @@ export function App() {
               alt='Buy Me A Coffee'
             />
           </a>
+          <ShareButton definition={editorContent} />
           <LanguageSwitcher />
           <ThemeToggle />
         </div>
@@ -187,40 +216,70 @@ export function App() {
           />
         )}
 
-        {/* Right: Diagram Viewer */}
-        <div className={styles.viewerArea}>
-          <MermaidViewer
-            definition={selectedDiagram.definition}
-            id={`minimap-demo-${selectedDiagram.id}`}
-            showControls={true}
-            showMinimap={!isMobile}
-            showFullscreenButton={true}
-            onFullscreenChange={handleFullscreenChange}
-            store={mermaidStore}
-          />
+        {/* Editor + Viewer Area */}
+        {isMobile ? (
+          /* Mobile: Preview only */
+          <div className={styles.viewerArea}>
+            <MermaidViewer
+              definition={selectedDiagram.definition}
+              id={`minimap-demo-${selectedDiagram.id}`}
+              showControls={true}
+              showMinimap={false}
+              showFullscreenButton={true}
+              onFullscreenChange={handleFullscreenChange}
+              store={mermaidStore}
+            />
 
-          {/* Mobile floating menu - left center, vertical */}
-          <nav className={styles.floatingMenu} aria-label={t("aria.mobileNavigation")}>
-            <button
-              type='button'
-              className={styles.floatingBtn}
-              onClick={openInfoDrawer}
-              aria-label={t("aria.openInfo")}
-              aria-expanded={isInfoDrawerOpen}
-            >
-              <Info size={18} aria-hidden='true' />
-            </button>
-            <button
-              type='button'
-              className={styles.floatingBtn}
-              onClick={openDiagramDrawer}
-              aria-label={t("aria.selectDiagram")}
-              aria-expanded={isDiagramDrawerOpen}
-            >
-              <Menu size={18} aria-hidden='true' />
-            </button>
-          </nav>
-        </div>
+            {/* Mobile floating menu - left center, vertical */}
+            <nav className={styles.floatingMenu} aria-label={t("aria.mobileNavigation")}>
+              <button
+                type='button'
+                className={styles.floatingBtn}
+                onClick={openInfoDrawer}
+                aria-label={t("aria.openInfo")}
+                aria-expanded={isInfoDrawerOpen}
+              >
+                <Info size={18} aria-hidden='true' />
+              </button>
+              <button
+                type='button'
+                className={styles.floatingBtn}
+                onClick={openDiagramDrawer}
+                aria-label={t("aria.selectDiagram")}
+                aria-expanded={isDiagramDrawerOpen}
+              >
+                <Menu size={18} aria-hidden='true' />
+              </button>
+            </nav>
+          </div>
+        ) : (
+          /* Desktop: Editor + Preview with splitter */
+          <HorizontalSplitter
+            left={
+              <div className={styles.editorPane}>
+                <MermaidEditor
+                  value={editorContent}
+                  onChange={handleEditorChange}
+                  error={snapshot.isError ? snapshot.errorMessage : null}
+                />
+              </div>
+            }
+            right={
+              <div className={styles.viewerArea}>
+                <MermaidViewer
+                  definition={editorContent}
+                  id={`minimap-demo-${selectedDiagram.id}`}
+                  showControls={true}
+                  showMinimap={true}
+                  showFullscreenButton={true}
+                  onFullscreenChange={handleFullscreenChange}
+                  store={mermaidStore}
+                />
+              </div>
+            }
+            initialRatio={0.4}
+          />
+        )}
 
         {/* Diagram drawer - mobile only */}
         <aside

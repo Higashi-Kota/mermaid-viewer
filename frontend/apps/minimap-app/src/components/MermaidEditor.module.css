@@ -1,0 +1,28 @@
+/* MermaidEditor - CodeMirror container styles */
+
+.editor {
+  height: 100%;
+  display: grid;
+  grid-template-rows: auto 1fr;
+  overflow: hidden;
+  background-color: var(--mermaid-color-surface);
+  border-radius: var(--mermaid-radius-sm);
+}
+
+.editorRoot {
+  height: 100%;
+  min-height: 0;
+  overflow: auto;
+}
+
+/* Error Banner */
+.errorBanner {
+  padding: var(--space-3) var(--space-4);
+  background-color: var(--editor-error-bg);
+  border-bottom: 1px solid var(--editor-error-border);
+  color: var(--editor-error-text);
+  font-size: var(--text-xs);
+  font-family: var(--font-mono);
+  white-space: pre-wrap;
+  word-break: break-word;
+}
