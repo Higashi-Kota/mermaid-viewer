@@ -1,0 +1,59 @@
+/* HorizontalSplitter - Grid-based horizontal resizer */
+
+.container {
+  display: grid;
+  height: 100%;
+  overflow: hidden;
+}
+
+.pane {
+  overflow: hidden;
+  min-width: 0;
+}
+
+/* Resize Handle */
+.handle {
+  width: var(--resizer-width);
+  cursor: col-resize;
+  display: grid;
+  place-items: center;
+  background-color: var(--resizer-bg);
+  transition: background-color var(--duration-fast);
+  touch-action: none;
+}
+
+.handle:hover {
+  background-color: var(--resizer-bg-hover);
+}
+
+.handle[data-dragging] {
+  background-color: var(--resizer-bg-hover);
+}
+
+/* Focus visible for keyboard users (WCAG 2.4.7) */
+.handle:focus-visible {
+  outline: 2px solid var(--mermaid-color-ring);
+  outline-offset: -2px;
+}
+
+/* Drag Indicator */
+.indicator {
+  width: 2px;
+  height: var(--resizer-handle-height);
+  border-radius: 1px;
+  background-color: var(--resizer-indicator);
+  transition: background-color var(--duration-fast);
+}
+
+.handle:hover .indicator,
+.handle[data-dragging] .indicator {
+  background-color: var(--resizer-indicator-active);
+}
+
+/* Reduced motion preference */
+@media (prefers-reduced-motion: reduce) {
+  .handle,
+  .indicator {
+    transition: none;
+  }
+}

@@ -67,4 +67,21 @@ export const appMessages = {
 
   // GitHub
   "github.repository": { ja: "GitHubリポジトリ", en: "GitHub repository" },
+
+  // Share
+  "share.button": { ja: "共有リンクをコピー", en: "Copy share link" },
+  "share.copied": { ja: "コピーしました！", en: "Link copied!" },
+
+  // Custom diagram (loaded from URL)
+  "diagram.custom.name": { ja: "カスタム図", en: "Custom Diagram" },
+  "diagram.custom.description": {
+    ja: "URLで共有されたカスタム図です。",
+    en: "A custom diagram shared via URL.",
+  },
+
+  // PWA Update
+  "pwa.updateAvailable": { ja: "アップデートがあります", en: "Update available" },
+  "pwa.newFeatures": { ja: "新機能が利用できます", en: "New features available" },
+  "pwa.updateNow": { ja: "今すぐ更新", en: "Update now" },
+  "pwa.later": { ja: "後で", en: "Later" },
 } as const satisfies Record<string, Record<Language, string>>

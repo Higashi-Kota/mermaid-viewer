@@ -12,12 +12,18 @@
     "css:types:watch": "tcm src --watch"
   },
   "dependencies": {
+    "@codemirror/commands": "^6.7.1",
+    "@codemirror/state": "^6.5.0",
+    "@codemirror/view": "^6.35.0",
     "@mermaid-demo/i18n": "workspace:*",
     "@mermaid-demo/mermaid": "workspace:*",
     "@mermaid-demo/messages": "workspace:*",
     "lucide-react": "^0.563.0",
+    "lz-string": "^1.5.0",
     "react": "^19.2.3",
-    "react-dom": "^19.2.3"
+    "react-dom": "^19.2.3",
+    "workbox-precaching": "^7.4.0",
+    "workbox-window": "^7.4.0"
   },
   "devDependencies": {
     "@internal/shared-config": "workspace:*",
@@ -28,6 +34,7 @@
     "concurrently": "^9.2.1",
     "typed-css-modules": "^0.9.1",
     "typescript": "^5.9.3",
-    "vite": "^7.3.1"
+    "vite": "^7.3.1",
+    "vite-plugin-pwa": "^1.2.0"
   }
 }

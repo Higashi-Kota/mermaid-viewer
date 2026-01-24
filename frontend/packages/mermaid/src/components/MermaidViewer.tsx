@@ -136,8 +136,10 @@ export function MermaidViewer({
   // Detect theme from document
   const documentTheme = useDocumentTheme()
 
-  // Generate unique ID (include theme to force re-render on theme change)
-  const baseId = useRef(id ?? `mermaid-viewer-${++idCounter}`).current
+  // Generate unique ID - must be reactive to id prop changes
+  // Use a stable ref for the fallback counter, but always use id prop if provided
+  const fallbackIdRef = useRef(`mermaid-viewer-${++idCounter}`)
+  const baseId = id ?? fallbackIdRef.current
   const diagramId = `${baseId}-${documentTheme}`
 
   // Render mermaid diagram
