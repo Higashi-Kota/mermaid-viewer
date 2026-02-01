@@ -71,7 +71,15 @@ export class RootErrorBoundary extends Component<RootErrorBoundaryProps, RootErr
           {report && (
             <details className={styles.details} open>
               <summary>Details</summary>
-              <pre className={styles.pre}>{report}</pre>
+              <div className={styles.detailsContent}>
+                <textarea
+                  className={styles.textarea}
+                  readOnly
+                  value={report}
+                  aria-label='Error report'
+                />
+                <pre className={styles.pre}>{report}</pre>
+              </div>
             </details>
           )}
         </div>
