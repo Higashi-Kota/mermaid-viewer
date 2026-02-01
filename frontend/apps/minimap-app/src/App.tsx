@@ -35,10 +35,8 @@ export function App() {
 
   // Clear URL params after loading from share URL
   useEffect(() => {
-    if (initialShareState) {
-      clearUrlParams()
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    if (!initialShareState) return
+    clearUrlParams()
   }, [clearUrlParams])
 
   // Inline handlers - NO useCallback (following project guidelines)
