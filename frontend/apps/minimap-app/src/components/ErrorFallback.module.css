@@ -1,0 +1,63 @@
+.root {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  background: var(--mermaid-color-surface);
+  color: var(--mermaid-color-fg);
+  z-index: 1000;
+}
+
+.card {
+  width: min(720px, 100%);
+  border: 1px solid var(--mermaid-color-border);
+  border-radius: var(--mermaid-radius-md);
+  background: var(--mermaid-color-surface-subtle);
+  box-shadow: var(--mermaid-shadow-float);
+  padding: 20px;
+}
+
+.title {
+  margin: 0 0 8px;
+  font-size: 20px;
+}
+
+.message {
+  margin: 0 0 16px;
+  color: var(--mermaid-color-fg-muted);
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.button {
+  border: 1px solid var(--mermaid-color-border);
+  border-radius: var(--mermaid-radius-sm);
+  background: var(--mermaid-color-surface);
+  color: var(--mermaid-color-fg);
+  padding: 6px 12px;
+  font-weight: 600;
+}
+
+.buttonPrimary {
+  background: var(--mermaid-color-primary);
+  border-color: var(--mermaid-color-primary);
+  color: var(--mermaid-color-primary-contrast);
+}
+
+.details {
+  font-size: 12px;
+  color: var(--mermaid-color-fg-muted);
+}
+
+.pre {
+  white-space: pre-wrap;
+  word-break: break-word;
+  margin: 8px 0 0;
+}
