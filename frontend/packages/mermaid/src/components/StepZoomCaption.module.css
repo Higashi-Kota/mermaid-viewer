@@ -1,0 +1,82 @@
+/* StepZoomCaption - Slide animation for step zoom captions */
+
+/* Overlay positioning - top-center of viewer area */
+.overlay {
+  position: absolute;
+  top: var(--primitive-space-6, 12px);
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: var(--primitive-z-controls, 10);
+  max-width: 360px;
+  width: max-content;
+  pointer-events: none;
+  background-color: var(--semantic-surface);
+  border: 1px solid var(--semantic-border);
+  border-radius: var(--primitive-radius-md, 8px);
+  box-shadow: var(--semantic-shadow-float);
+  padding: var(--primitive-space-4, 8px) var(--primitive-space-6, 12px);
+}
+
+.container {
+  overflow: hidden;
+  padding: var(--primitive-space-4, 8px) 0;
+}
+
+.slideDown {
+  animation: slideDown var(--primitive-duration-normal, 200ms) ease-out;
+}
+
+.slideUp {
+  animation: slideUp var(--primitive-duration-normal, 200ms) ease-out;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.stepNumber {
+  font-size: var(--primitive-text-sm, 12px);
+  color: var(--semantic-fg-muted);
+  font-variant-numeric: tabular-nums;
+  margin-bottom: var(--primitive-space-2, 4px);
+}
+
+.label {
+  font-size: var(--primitive-text-2xl);
+  font-weight: 600;
+  color: var(--semantic-fg);
+  margin: 0 0 var(--primitive-space-4, 8px);
+  line-height: 1.3;
+}
+
+.description {
+  font-size: var(--primitive-text-sm, 14px);
+  color: var(--semantic-fg-muted);
+  line-height: 1.5;
+  margin: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .slideDown,
+  .slideUp {
+    animation: none;
+  }
+}

@@ -34,7 +34,7 @@ jobs:
         run: pnpm install --frozen-lockfile
 
       - name: Generate CSS Module types
-        run: pnpm -r --if-present css:types
+        run: pnpm -r --if-present css:generate
 
       - name: Lint
         run: pnpm lint

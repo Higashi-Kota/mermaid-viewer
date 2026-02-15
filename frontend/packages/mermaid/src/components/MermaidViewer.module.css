@@ -9,9 +9,9 @@
   height: 100%;
   min-height: 200px;
   overflow: hidden;
-  border: 1px solid var(--mermaid-color-border-subtle);
-  border-radius: var(--mermaid-radius-md);
-  background-color: var(--mermaid-color-surface);
+  border: 1px solid var(--semantic-border-subtle);
+  border-radius: var(--primitive-radius-md);
+  background-color: var(--semantic-surface);
 }
 
 /* Pan-Zoom content area - fills viewer */
@@ -46,29 +46,29 @@
  * ============================================= */
 .fullscreenButton {
   position: absolute;
-  top: var(--space-4, 8px);
-  right: var(--space-4, 8px);
-  z-index: var(--z-controls, 10);
+  top: var(--primitive-space-4, 8px);
+  right: var(--primitive-space-4, 8px);
+  z-index: var(--primitive-z-controls, 10);
   display: grid;
   place-items: center;
 
   /* WCAG 2.5.5 AAA touch target */
-  width: var(--touch-target-min, 44px);
-  height: var(--touch-target-min, 44px);
+  width: var(--primitive-size-target-min, 44px);
+  height: var(--primitive-size-target-min, 44px);
 
   padding: 0;
-  border: 1px solid var(--mermaid-color-border);
-  border-radius: var(--mermaid-radius-sm);
-  background-color: var(--mermaid-color-surface);
-  color: var(--mermaid-color-fg-muted);
+  border: 1px solid var(--semantic-border);
+  border-radius: var(--primitive-radius-sm);
+  background-color: var(--semantic-surface);
+  color: var(--semantic-fg-muted);
   cursor: pointer;
   touch-action: manipulation;
 
   /* Always visible on touch devices */
   opacity: 1;
   transition:
-    background-color var(--duration-fast, 150ms),
-    color var(--duration-fast, 150ms);
+    background-color var(--primitive-duration-fast, 150ms),
+    color var(--primitive-duration-fast, 150ms);
 }
 
 /* Hide on hover for non-touch devices only */
@@ -76,9 +76,9 @@
   .fullscreenButton {
     opacity: 0;
     transition:
-      opacity var(--duration-normal, 200ms),
-      background-color var(--duration-fast, 150ms),
-      color var(--duration-fast, 150ms);
+      opacity var(--primitive-duration-normal, 200ms),
+      background-color var(--primitive-duration-fast, 150ms),
+      color var(--primitive-duration-fast, 150ms);
   }
 
   .viewer:hover .fullscreenButton,
@@ -88,21 +88,21 @@
 }
 
 .fullscreenButton:hover {
-  background-color: var(--mermaid-color-surface-hover);
-  color: var(--mermaid-color-fg);
+  background-color: var(--semantic-surface-hover);
+  color: var(--semantic-fg);
 }
 
 .fullscreenButton:focus-visible {
   opacity: 1;
-  outline: 2px solid var(--mermaid-color-ring);
+  outline: 2px solid var(--semantic-ring);
   outline-offset: 2px;
 }
 
 /* Container query: adjust position when viewer is narrow */
 @container mermaid-viewer (max-width: 300px) {
   .fullscreenButton {
-    top: var(--space-2, 4px);
-    right: var(--space-2, 4px);
+    top: var(--primitive-space-2, 4px);
+    right: var(--primitive-space-2, 4px);
   }
 }
 
@@ -112,19 +112,19 @@
   place-items: center;
   place-content: center;
   min-height: 200px;
-  gap: 12px;
-  color: var(--mermaid-color-fg-muted);
-  background-color: var(--mermaid-color-surface);
-  border: 1px solid var(--mermaid-color-border-subtle);
-  border-radius: var(--mermaid-radius-md);
+  gap: var(--primitive-space-6);
+  color: var(--semantic-fg-muted);
+  background-color: var(--semantic-surface);
+  border: 1px solid var(--semantic-border-subtle);
+  border-radius: var(--primitive-radius-md);
 }
 
 /* Spinner */
 .spinner {
   width: 24px;
   height: 24px;
-  border: 2px solid var(--mermaid-color-border);
-  border-top-color: var(--mermaid-color-primary);
+  border: 2px solid var(--semantic-border);
+  border-top-color: var(--semantic-primary);
   border-radius: 50%;
   animation: spin 0.8s linear infinite;
 }
@@ -137,27 +137,28 @@
 
 /* Error state */
 .error {
-  padding: 16px;
+  display: grid;
+  gap: var(--primitive-space-4);
+  padding: var(--primitive-space-8);
   min-height: 200px;
-  background-color: var(--mermaid-color-destructive-subtle);
-  border: 1px solid var(--mermaid-color-destructive);
-  border-radius: var(--mermaid-radius-md);
+  background-color: var(--semantic-destructive-subtle);
+  border: 1px solid var(--semantic-destructive);
+  border-radius: var(--primitive-radius-md);
 }
 
 .errorTitle {
   font-weight: 600;
-  color: var(--mermaid-color-destructive);
-  margin-bottom: 8px;
+  color: var(--semantic-destructive);
 }
 
 .errorDetails {
-  font-size: 12px;
-  font-family: monospace;
+  font-size: var(--primitive-text-sm);
+  font-family: var(--primitive-font-mono);
   white-space: pre-wrap;
-  color: var(--mermaid-color-fg-muted);
-  background: var(--mermaid-color-surface-subtle);
-  padding: 8px;
-  border-radius: 4px;
+  color: var(--semantic-fg-muted);
+  background: var(--semantic-surface-subtle);
+  padding: var(--primitive-space-4);
+  border-radius: var(--primitive-radius-sm);
   overflow-x: auto;
 }
 
@@ -166,7 +167,7 @@
   overflow: hidden;
   position: relative;
   cursor: grab;
-  background-color: var(--mermaid-color-surface);
+  background-color: var(--semantic-surface);
   touch-action: none;
 }
 

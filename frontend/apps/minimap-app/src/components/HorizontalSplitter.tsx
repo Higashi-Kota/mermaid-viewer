@@ -13,6 +13,8 @@ export interface HorizontalSplitterProps {
   readonly minRatio?: number
   /** 最大比率（デフォルト: 0.8） */
   readonly maxRatio?: number
+  /** リサイザーのアクセシブルラベル */
+  readonly "aria-label"?: string
   /** 追加のクラス名 */
   readonly className?: string
   /** React 19 ref support */
@@ -31,6 +33,7 @@ export function HorizontalSplitter({
   initialRatio = 0.4,
   minRatio = 0.2,
   maxRatio = 0.8,
+  "aria-label": ariaLabel = "Resize editor and preview panels",
   className = "",
   ref,
 }: HorizontalSplitterProps) {
@@ -121,7 +124,7 @@ export function HorizontalSplitter({
         aria-valuenow={Math.round(ratio * 100)}
         aria-valuemin={Math.round(minRatio * 100)}
         aria-valuemax={Math.round(maxRatio * 100)}
-        aria-label='Resize editor and preview panels'
+        aria-label={ariaLabel}
       >
         {/* ドラッグインジケーター */}
         <div className={styles.indicator} />

@@ -4,8 +4,8 @@
 .overlay {
   position: fixed;
   inset: 0;
-  z-index: 1000;
-  background-color: var(--mermaid-color-surface);
+  z-index: var(--primitive-z-fullscreen);
+  background-color: var(--semantic-surface);
   display: grid;
   grid-template-rows: auto 1fr;
 }
@@ -15,23 +15,23 @@
   display: grid;
   grid-template-columns: 1fr auto;
   align-items: center;
-  padding: 12px 20px;
-  background-color: var(--mermaid-color-surface-subtle);
-  border-bottom: 1px solid var(--mermaid-color-border);
+  padding: var(--primitive-space-6) var(--primitive-space-10);
+  background-color: var(--semantic-surface-subtle);
+  border-bottom: 1px solid var(--semantic-border);
 }
 
 .title {
   margin: 0;
-  font-size: 14px;
+  font-size: var(--primitive-text-md);
   font-weight: 600;
-  color: var(--mermaid-color-fg);
+  color: var(--semantic-fg);
 }
 
 /* Header actions - Grid for gap-based layout */
 .actions {
   display: grid;
   grid-auto-flow: column;
-  gap: 12px;
+  gap: var(--primitive-space-6);
   align-items: center;
 }
 
@@ -39,25 +39,25 @@
 .closeBtn {
   display: grid;
   place-items: center;
-  width: 32px;
-  height: 32px;
+  width: var(--primitive-space-12);
+  height: var(--primitive-space-12);
   border: none;
-  border-radius: var(--mermaid-radius-sm);
+  border-radius: var(--primitive-radius-sm);
   background-color: transparent;
-  color: var(--mermaid-color-fg-muted);
+  color: var(--semantic-fg-muted);
   cursor: pointer;
   transition:
-    background-color 0.15s,
-    color 0.15s;
+    background-color var(--primitive-duration-fast),
+    color var(--primitive-duration-fast);
 }
 
 .closeBtn:hover {
-  background-color: var(--mermaid-color-surface-hover);
-  color: var(--mermaid-color-fg);
+  background-color: var(--semantic-surface-hover);
+  color: var(--semantic-fg);
 }
 
 .closeBtn:focus-visible {
-  outline: 2px solid var(--mermaid-color-ring);
+  outline: 2px solid var(--semantic-ring);
   outline-offset: 2px;
 }
 

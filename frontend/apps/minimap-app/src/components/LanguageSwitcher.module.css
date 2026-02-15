@@ -1,35 +1,35 @@
 .switcher {
   display: grid;
   place-items: center;
-  min-width: var(--touch-target-min);
-  height: var(--touch-target-min);
-  padding: 0 var(--space-3);
+  min-width: var(--primitive-size-target-min);
+  height: var(--primitive-size-target-min);
+  padding: 0 var(--primitive-space-3);
   border: none;
-  border-radius: var(--mermaid-radius-sm);
+  border-radius: var(--primitive-radius-sm);
   background-color: transparent;
-  color: var(--mermaid-color-fg-muted);
+  color: var(--semantic-fg-muted);
   cursor: pointer;
   touch-action: manipulation;
   transition:
-    color var(--duration-fast),
-    background-color var(--duration-fast);
+    color var(--primitive-duration-fast),
+    background-color var(--primitive-duration-fast);
 }
 
 .switcher:hover {
-  color: var(--mermaid-color-fg);
-  background-color: var(--mermaid-color-surface-hover);
+  color: var(--semantic-fg);
+  background-color: var(--semantic-surface-hover);
 }
 
 .switcher:focus-visible {
-  outline: 2px solid var(--mermaid-color-ring);
+  outline: 2px solid var(--semantic-ring);
   outline-offset: 2px;
 }
 
 .label {
-  font-family: var(--font-mono);
-  font-size: var(--text-sm);
-  font-weight: var(--font-semibold);
-  letter-spacing: var(--tracking-wide);
+  font-family: var(--primitive-font-mono);
+  font-size: var(--primitive-text-sm);
+  font-weight: var(--primitive-weight-semibold);
+  letter-spacing: var(--primitive-tracking-wide);
 }
 
 @media (prefers-reduced-motion: reduce) {

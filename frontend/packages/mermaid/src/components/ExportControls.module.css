@@ -4,7 +4,7 @@
 .controls {
   display: grid;
   grid-auto-flow: column;
-  gap: 8px;
+  gap: var(--primitive-space-4);
 }
 
 /* Export button base */
@@ -12,28 +12,28 @@
   display: grid;
   grid-template-columns: auto auto;
   align-items: center;
-  gap: 6px;
-  border-radius: var(--mermaid-radius-sm);
-  border: 1px solid var(--mermaid-color-border);
-  background-color: var(--mermaid-color-surface);
-  padding: 6px 12px;
-  font-size: 12px;
+  gap: var(--primitive-space-3);
+  border-radius: var(--primitive-radius-sm);
+  border: 1px solid var(--semantic-border);
+  background-color: var(--semantic-surface);
+  padding: var(--primitive-space-3) var(--primitive-space-6);
+  font-size: var(--primitive-text-sm);
   font-weight: 500;
-  color: var(--mermaid-color-fg);
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+  color: var(--semantic-fg);
+  box-shadow: var(--semantic-shadow-sm);
   cursor: pointer;
   transition:
-    border-color 0.15s,
-    background-color 0.15s;
+    border-color var(--primitive-duration-fast),
+    background-color var(--primitive-duration-fast);
 }
 
 .btn:hover {
-  border-color: var(--mermaid-color-primary);
-  background-color: var(--mermaid-color-surface-hover);
+  border-color: var(--semantic-primary);
+  background-color: var(--semantic-surface-hover);
 }
 
 .btn:focus-visible {
-  outline: 2px solid var(--mermaid-color-ring);
+  outline: 2px solid var(--semantic-ring);
   outline-offset: 2px;
 }
 

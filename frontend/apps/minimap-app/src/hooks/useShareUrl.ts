@@ -1,5 +1,4 @@
 import LZString from "lz-string"
-import { useCallback } from "react"
 
 interface ShareState {
   definition: string
@@ -27,7 +26,7 @@ export function getInitialShareState(): ShareState | null {
 
 export function useShareUrl() {
   // Parse URL on mount
-  const getShareStateFromUrl = useCallback((): ShareState | null => {
+  function getShareStateFromUrl(): ShareState | null {
     const params = new URLSearchParams(window.location.search)
     const code = params.get("code")
     if (!code) return null
@@ -39,37 +38,34 @@ export function useShareUrl() {
     } catch {
       return null
     }
-  }, [])
+  }
 
   // Generate share URL
-  const generateShareUrl = useCallback((definition: string): string => {
+  function generateShareUrl(definition: string): string {
     const compressed = LZString.compressToEncodedURIComponent(definition)
     const url = new URL(window.location.href)
     url.search = "" // Clear existing params
     url.searchParams.set("code", compressed)
     return url.toString()
-  }, [])
+  }
 
   // Copy to clipboard
-  const copyShareUrl = useCallback(
-    async (definition: string): Promise<boolean> => {
-      try {
-        const url = generateShareUrl(definition)
-        await navigator.clipboard.writeText(url)
-        return true
-      } catch {
-        return false
-      }
-    },
-    [generateShareUrl],
-  )
+  async function copyShareUrl(definition: string): Promise<boolean> {
+    try {
+      const url = generateShareUrl(definition)
+      await navigator.clipboard.writeText(url)
+      return true
+    } catch {
+      return false
+    }
+  }
 
   // Clear URL params (after restoring state)
-  const clearUrlParams = useCallback(() => {
+  function clearUrlParams() {
     const url = new URL(window.location.href)
     url.search = ""
     window.history.replaceState({}, "", url.toString())
-  }, [])
+  }
 
   return {
     getShareStateFromUrl,

@@ -1,5 +1,7 @@
 import { PanZoomManager } from "../core/PanZoomManager"
 import { RenderStateManager } from "../core/RenderStateManager"
+import type { StepInfo } from "../core/StepZoomManager"
+import { StepZoomManager } from "../core/StepZoomManager"
 import type { SvgDimensions, TouchPoint, TransformState, ZoomConstraints } from "../types"
 
 /**
@@ -22,6 +24,9 @@ export interface MermaidSnapshot {
   readonly transformState: TransformState
   readonly isPanning: boolean
   readonly zoom: number
+
+  // ステップズーム
+  readonly stepZoom: StepZoomManager
 }
 
 /**
@@ -37,6 +42,7 @@ export class MermaidStore {
   // === Immutable Managers ===
   private _renderState: RenderStateManager
   private _panZoom: PanZoomManager
+  private _stepZoom: StepZoomManager
 
   // === UI State ===
   private _isFullscreen = false
@@ -50,6 +56,7 @@ export class MermaidStore {
   private constructor() {
     this._renderState = RenderStateManager.idle()
     this._panZoom = PanZoomManager.empty()
+    this._stepZoom = StepZoomManager.inactive()
   }
 
   /**
@@ -112,6 +119,9 @@ export class MermaidStore {
       transformState: this._panZoom.transformState,
       isPanning: this._panZoom.isPanning,
       zoom: this._panZoom.zoom,
+
+      // ステップズーム
+      stepZoom: this._stepZoom,
     }
   }
 
@@ -129,6 +139,10 @@ export class MermaidStore {
 
   get isFullscreen(): boolean {
     return this._isFullscreen
+  }
+
+  get stepZoom(): StepZoomManager {
+    return this._stepZoom
   }
 
   // ==========================================
@@ -357,6 +371,62 @@ export class MermaidStore {
   }
 
   // ==========================================
+  // Step Zoom Methods
+  // ==========================================
+
+  /**
+   * ステップズームを開始
+   */
+  enterStepZoom(steps: readonly StepInfo[]): void {
+    this._stepZoom = StepZoomManager.create(steps)
+    this.notify()
+  }
+
+  /**
+   * ステップズームを終了
+   */
+  exitStepZoom(): void {
+    const newStepZoom = this._stepZoom.deactivate()
+    if (newStepZoom !== this._stepZoom) {
+      this._stepZoom = newStepZoom
+      this.notify()
+    }
+  }
+
+  /**
+   * 次のステップへ
+   */
+  nextStep(): void {
+    const newStepZoom = this._stepZoom.next()
+    if (newStepZoom !== this._stepZoom) {
+      this._stepZoom = newStepZoom
+      this.notify()
+    }
+  }
+
+  /**
+   * 前のステップへ
+   */
+  previousStep(): void {
+    const newStepZoom = this._stepZoom.previous()
+    if (newStepZoom !== this._stepZoom) {
+      this._stepZoom = newStepZoom
+      this.notify()
+    }
+  }
+
+  /**
+   * 指定ステップへ移動
+   */
+  goToStep(index: number): void {
+    const newStepZoom = this._stepZoom.goToStep(index)
+    if (newStepZoom !== this._stepZoom) {
+      this._stepZoom = newStepZoom
+      this.notify()
+    }
+  }
+
+  // ==========================================
   // Combined Operations
   // ==========================================
 
@@ -366,6 +436,7 @@ export class MermaidStore {
   reset(): void {
     this._renderState = RenderStateManager.idle()
     this._panZoom = PanZoomManager.empty()
+    this._stepZoom = StepZoomManager.inactive()
     this._isFullscreen = false
     this.notify()
   }

@@ -1,0 +1,67 @@
+/* ToggleGroup component — W3C APG Radio Group with button styling */
+
+.group {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(120px, max-content));
+  border: 1px solid var(--semantic-border);
+  border-radius: var(--primitive-radius-md);
+  background-color: var(--semantic-surface-subtle);
+  padding: var(--primitive-space-1);
+  gap: var(--primitive-space-1);
+}
+
+/* Vertical: single column stack, left-aligned labels */
+.group[data-orientation="vertical"] {
+  grid-template-columns: 1fr;
+}
+
+.group[data-orientation="vertical"] .item {
+  justify-content: start;
+}
+
+.item {
+  display: grid;
+  place-items: center;
+  min-height: var(--primitive-size-target-min);
+  padding: var(--primitive-space-2) var(--primitive-space-6);
+  border: none;
+  border-radius: var(--primitive-radius-sm);
+  background-color: transparent;
+  color: var(--semantic-fg-muted);
+  font-family: inherit;
+  font-size: var(--primitive-text-sm);
+  font-weight: var(--primitive-weight-medium);
+  line-height: var(--primitive-leading-tight);
+  cursor: pointer;
+  touch-action: manipulation;
+  transition:
+    background-color var(--primitive-duration-fast) ease-out,
+    color var(--primitive-duration-fast) ease-out;
+}
+
+.item:hover:not([data-selected]) {
+  background-color: var(--semantic-surface-hover);
+  color: var(--semantic-fg);
+}
+
+.item[data-selected] {
+  background-color: var(--semantic-primary);
+  color: var(--primitive-color-white);
+}
+
+.item[data-selected]:hover {
+  background-color: var(--semantic-primary-hover);
+}
+
+.item:focus-visible {
+  outline: 2px solid var(--semantic-ring);
+  outline-offset: 2px;
+}
+
+/* --- Reduced motion --- */
+
+@media (prefers-reduced-motion: reduce) {
+  .item {
+    transition: none;
+  }
+}

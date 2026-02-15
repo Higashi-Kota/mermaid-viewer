@@ -3,6 +3,7 @@ node_modules/
 .pnpm-store/
 
 *.css.d.ts
+storybook-static
 
 # Build outputs
 dist/

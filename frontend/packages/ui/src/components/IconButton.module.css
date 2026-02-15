@@ -1,0 +1,62 @@
+/* IconButton component */
+
+.button {
+  display: grid;
+  place-items: center;
+  border: none;
+  border-radius: var(--primitive-radius-md);
+  background-color: transparent;
+  color: var(--semantic-fg);
+  cursor: pointer;
+  touch-action: manipulation;
+  transition:
+    background-color var(--primitive-duration-fast) ease-out,
+    color var(--primitive-duration-fast) ease-out;
+}
+
+.button:hover:not(:disabled) {
+  background-color: var(--semantic-surface-hover);
+}
+
+.button:focus-visible {
+  outline: 2px solid var(--semantic-ring);
+  outline-offset: 2px;
+}
+
+.button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.button[aria-pressed="true"] {
+  background-color: var(--semantic-primary-alpha);
+  color: var(--semantic-primary);
+}
+
+/* --- Sizes --- */
+
+.sm {
+  min-width: var(--primitive-size-target-min);
+  min-height: var(--primitive-size-target-min);
+  padding: var(--primitive-space-2);
+}
+
+.md {
+  min-width: var(--primitive-size-target-min);
+  min-height: var(--primitive-size-target-min);
+  padding: var(--primitive-space-3);
+}
+
+.lg {
+  min-width: var(--primitive-size-target-min);
+  min-height: var(--primitive-size-target-min);
+  padding: var(--primitive-space-4);
+}
+
+/* --- Reduced motion --- */
+
+@media (prefers-reduced-motion: reduce) {
+  .button {
+    transition: none;
+  }
+}

@@ -1,0 +1,78 @@
+/* BottomDrawer component */
+
+.backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: var(--primitive-z-drawer-backdrop);
+  background-color: var(--semantic-backdrop);
+  animation: fadeIn var(--primitive-duration-normal) ease-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.drawer {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: var(--primitive-z-drawer);
+  max-height: 70vh;
+
+  display: grid;
+  grid-template-rows: auto 1fr;
+  gap: var(--primitive-space-4);
+  padding: var(--primitive-space-4) var(--primitive-space-6) var(--primitive-space-6);
+
+  background-color: var(--semantic-surface-subtle);
+  border-top: 1px solid var(--semantic-border);
+  border-radius: var(--primitive-radius-md) var(--primitive-radius-md) 0 0;
+  box-shadow: var(--semantic-shadow-drawer);
+
+  transform: translateY(100%);
+  transition: transform var(--primitive-duration-drawer) cubic-bezier(0.32, 0.72, 0, 1);
+}
+
+.drawer[data-open] {
+  transform: translateY(0);
+}
+
+/* Hide on desktop */
+@media (min-width: 768px) {
+  .backdrop {
+    display: none;
+  }
+
+  .drawer {
+    display: none;
+  }
+}
+
+.header {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: center;
+  gap: var(--primitive-space-4);
+}
+
+.body {
+  overflow-y: auto;
+}
+
+/* --- Reduced motion --- */
+
+@media (prefers-reduced-motion: reduce) {
+  .backdrop {
+    animation: none;
+  }
+
+  .drawer {
+    transition: none;
+  }
+}

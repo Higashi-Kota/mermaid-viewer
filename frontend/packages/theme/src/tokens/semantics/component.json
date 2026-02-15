@@ -1,0 +1,20 @@
+{
+  "semantic": {
+    "toast": {
+      "info-bg": { "value": "{primitive.color.blue.50}" },
+      "info-icon": { "value": "{primitive.color.blue.500}" }
+    },
+    "toast-dark": {
+      "info-bg": { "value": "{primitive.color.blue.900}" },
+      "info-icon": { "value": "{semantic.primary}" }
+    },
+    "resizer": {
+      "width": { "value": "6px" },
+      "handle-height": { "value": "40px" },
+      "bg": { "value": "{semantic.border}" },
+      "bg-hover": { "value": "{semantic.primary}" },
+      "indicator": { "value": "{semantic.fg-muted}" },
+      "indicator-active": { "value": "{primitive.color.white}" }
+    }
+  }
+}

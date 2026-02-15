@@ -1,0 +1,93 @@
+/*
+ * Modern CSS Reset 2026
+ * Based on Josh W. Comeau's Custom CSS Reset (December 2025)
+ * https://www.joshwcomeau.com/css/custom-css-reset/
+ */
+
+/* 1. Box sizing model */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+/* 2. Remove default margin (except dialog) */
+*:not(dialog) {
+  margin: 0;
+}
+
+/* 3. Enable keyword animations (March 2025) */
+@media (prefers-reduced-motion: no-preference) {
+  html {
+    interpolate-size: allow-keywords;
+  }
+}
+
+/* 4. Typography baseline */
+html {
+  font-size: 100%; /* 16px base for accessibility */
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+
+/* 5. Improve media defaults */
+img,
+picture,
+video,
+canvas,
+svg {
+  display: block;
+  max-width: 100%;
+}
+
+/* 6. Inherit fonts for form controls */
+input,
+button,
+textarea,
+select {
+  font: inherit;
+  color: inherit;
+}
+
+/* 7. Avoid text overflows */
+p,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  overflow-wrap: break-word;
+}
+
+/* 8. Improve line wrapping (October 2024) */
+p {
+  text-wrap: pretty;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  text-wrap: balance;
+}
+
+/* 9. Root stacking context */
+#root,
+#__next {
+  isolation: isolate;
+}
+
+/* 10. Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

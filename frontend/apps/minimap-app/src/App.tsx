@@ -1,7 +1,18 @@
-import { MermaidStore, MermaidViewer, useMermaidStore } from "@mermaid-demo/mermaid"
+import {
+  type FlowchartParseResult,
+  isFlowchartDefinition,
+  MermaidStore,
+  MermaidViewer,
+  type MermaidViewerHandle,
+  parseFlowchart,
+  StepListEditor,
+  useMermaidStore,
+} from "@mermaid-demo/mermaid"
 import { useAppTranslation } from "@mermaid-demo/messages"
-import { Github, Info, Menu, X } from "lucide-react"
-import { useEffect, useState } from "react"
+import type { ToggleGroupItem } from "@mermaid-demo/ui"
+import { BottomDrawer, BottomDrawerBody, BottomDrawerHeader, ToggleGroup } from "@mermaid-demo/ui"
+import { Github, Info, Maximize2, Menu, X } from "lucide-react"
+import { useEffect, useRef, useState } from "react"
 import styles from "./App.module.css"
 import { HorizontalSplitter } from "./components/HorizontalSplitter"
 import { LanguageSwitcher } from "./components/LanguageSwitcher"
@@ -26,12 +37,49 @@ export function App() {
   const [editorContent, setEditorContent] = useState<string>(() =>
     initialShareState ? initialShareState.definition : SAMPLE_DIAGRAMS[0].definition,
   )
+  const [descriptions, setDescriptions] = useState<Record<string, string>>({})
   const [isInfoDrawerOpen, setIsInfoDrawerOpen] = useState(false)
   const [isDiagramDrawerOpen, setIsDiagramDrawerOpen] = useState(false)
+  const viewerRef = useRef<MermaidViewerHandle>(null)
   const snapshot = useMermaidStore(mermaidStore)
   const isMobile = useIsMobile()
   const { t } = useAppTranslation()
   const { clearUrlParams } = useShareUrl()
+
+  // Computed values
+  const isFlowchart = isFlowchartDefinition(editorContent)
+  const diagramItems: readonly ToggleGroupItem[] = SAMPLE_DIAGRAMS.map((diagram) => ({
+    value: diagram.id,
+    label: t(diagram.nameKey),
+  }))
+
+  // AST パース結果（非同期、外部ライブラリとの同期 = useEffect 適合）
+  const parseResultRef = useRef<FlowchartParseResult>({
+    nodeIds: [],
+    nodeLabels: new Map<string, string>(),
+  })
+  const [, setParseVersion] = useState(0)
+
+  useEffect(() => {
+    if (!isFlowchart) {
+      parseResultRef.current = { nodeIds: [], nodeLabels: new Map<string, string>() }
+      setParseVersion((v) => v + 1)
+      return
+    }
+
+    let cancelled = false
+    parseFlowchart(editorContent).then((result) => {
+      if (cancelled) return
+      parseResultRef.current = result
+      setParseVersion((v) => v + 1)
+    })
+
+    return () => {
+      cancelled = true
+    }
+  }, [editorContent, isFlowchart])
+
+  const { nodeIds, nodeLabels } = parseResultRef.current
 
   // Clear URL params after loading from share URL
   useEffect(() => {
@@ -39,12 +87,13 @@ export function App() {
     clearUrlParams()
   }, [clearUrlParams])
 
-  // Inline handlers - NO useCallback (following project guidelines)
+  // Inline handlers
   function handleDiagramSelect(diagram: DiagramDefinition) {
     // Skip if same diagram is selected
     if (selectedDiagram.id === diagram.id) return
     setSelectedDiagram(diagram)
     setEditorContent(diagram.definition)
+    setDescriptions({})
     // Reset the store when switching diagrams
     mermaidStore.reset()
   }
@@ -57,6 +106,14 @@ export function App() {
 
   function handleFullscreenChange(_isFullscreen: boolean) {
     // console.log("Fullscreen changed:", isFullscreen)
+  }
+
+  function handleDescriptionChange(nodeId: string, description: string) {
+    setDescriptions((prev) => ({ ...prev, [nodeId]: description }))
+  }
+
+  function handleStepClick(index: number) {
+    viewerRef.current?.goToStep(index)
   }
 
   function openInfoDrawer() {
@@ -119,114 +176,38 @@ export function App() {
       </header>
 
       {/* Diagram Selector - Desktop only */}
-      <fieldset className={styles.selectorSection}>
-        <legend className={styles.visuallyHidden}>{t("aria.diagramSelection")}</legend>
-        {SAMPLE_DIAGRAMS.map((diagram) => (
-          <button
-            key={diagram.id}
-            type='button'
-            aria-pressed={selectedDiagram.id === diagram.id}
-            data-active={selectedDiagram.id === diagram.id ? "" : undefined}
-            onClick={() => handleDiagramSelect(diagram)}
-          >
-            {t(diagram.nameKey)}
-          </button>
-        ))}
-      </fieldset>
+      <div className={styles.selectorSection}>
+        <ToggleGroup
+          name='diagram-selector'
+          items={diagramItems}
+          value={selectedDiagram.id}
+          onChange={(value) => {
+            const diagram = SAMPLE_DIAGRAMS.find((d) => d.id === value)
+            if (diagram) handleDiagramSelect(diagram)
+          }}
+          aria-label={t("aria.diagramSelection")}
+        />
+      </div>
 
       {/* Main Content */}
-      <main className={styles.main}>
-        {/* Left: Diagram Info - Desktop sidebar / Mobile drawer */}
-        <aside className={styles.sidebar} data-drawer-open={isInfoDrawerOpen ? "" : undefined}>
-          {/* Drawer handle - mobile only */}
-          <div className={styles.drawerHandle}>
-            <button
-              type='button'
-              className={styles.drawerCloseBtn}
-              onClick={closeInfoDrawer}
-              aria-label={t("drawer.closeInfo")}
-            >
-              <X size={20} aria-hidden='true' />
-            </button>
-          </div>
-
-          <h2 className={styles.sidebarTitle}>{t(selectedDiagram.nameKey)}</h2>
-          <p className={styles.sidebarDescription}>{t(selectedDiagram.descriptionKey)}</p>
-
-          <div className={styles.stateSection}>
-            <h3 className={styles.sectionTitle}>{t("sidebar.storeState")}</h3>
-            <div className={styles.stateBox}>
-              <div className={styles.stateRow}>
-                <span className={styles.stateLabel}>{t("sidebar.fullscreen")}: </span>
-                <span className={styles.stateValue}>{String(snapshot.isFullscreen)}</span>
-              </div>
-              <div className={styles.stateRow}>
-                <span className={styles.stateLabel}>{t("sidebar.loading")}: </span>
-                <span className={styles.stateValue}>{String(snapshot.isLoading)}</span>
-              </div>
-              <div className={styles.stateRow}>
-                <span className={styles.stateLabel}>{t("sidebar.zoom")}: </span>
-                <span className={styles.stateValue}>{(snapshot.zoom * 100).toFixed(0)}%</span>
-              </div>
-              <div className={styles.stateRow}>
-                <span className={styles.stateLabel}>{t("sidebar.pan")}: </span>
-                <span className={styles.stateValue}>
-                  ({snapshot.transformState.panX.toFixed(0)},{" "}
-                  {snapshot.transformState.panY.toFixed(0)})
-                </span>
-              </div>
-              {snapshot.svgDimensions && (
-                <div className={styles.stateRow}>
-                  <span className={styles.stateLabel}>{t("sidebar.dimensions")}: </span>
-                  <span className={styles.stateValue}>
-                    {snapshot.svgDimensions.width} x {snapshot.svgDimensions.height}
-                  </span>
-                </div>
-              )}
-            </div>
-          </div>
-
-          <div>
-            <h3 className={styles.sectionTitle}>{t("instructions.title")}</h3>
-            <ul className={styles.instructions}>
-              <li>{t("instructions.pinchZoom")}</li>
-              <li>{t("instructions.dragPan")}</li>
-              <li>{t("instructions.zoomControls")}</li>
-              <li>{t("instructions.minimapViewport")}</li>
-              <li>{t("instructions.minimapNavigate")}</li>
-              <li>{t("instructions.fullscreenButton")}</li>
-              <li>{t("instructions.escapeClose")}</li>
-            </ul>
-          </div>
-        </aside>
-
-        {/* Drawer backdrop - mobile only, click to close */}
-        {(isInfoDrawerOpen || isDiagramDrawerOpen) && (
-          <div
-            className={styles.drawerBackdrop}
-            onClick={isInfoDrawerOpen ? closeInfoDrawer : closeDiagramDrawer}
-            onKeyDown={(e) => {
-              if (e.key === "Escape" || e.key === "Enter" || e.key === " ") {
-                isInfoDrawerOpen ? closeInfoDrawer() : closeDiagramDrawer()
-              }
-            }}
-            tabIndex={-1}
-            aria-hidden='true'
-          />
-        )}
-
+      <main
+        className={styles.main}
+        inert={isInfoDrawerOpen || isDiagramDrawerOpen ? true : undefined}
+      >
         {/* Editor + Viewer Area */}
         {isMobile ? (
           /* Mobile: Preview only */
           <div className={styles.viewerArea}>
             <MermaidViewer
+              ref={viewerRef}
               definition={selectedDiagram.definition}
               id={`minimap-demo-${selectedDiagram.id}`}
               showControls={true}
               showMinimap={false}
-              showFullscreenButton={true}
+              showFullscreenButton={false}
               onFullscreenChange={handleFullscreenChange}
               store={mermaidStore}
+              stepDescriptions={descriptions}
             />
 
             {/* Mobile floating menu - left center, vertical */}
@@ -249,69 +230,136 @@ export function App() {
               >
                 <Menu size={18} aria-hidden='true' />
               </button>
+              <button
+                type='button'
+                className={styles.floatingBtn}
+                onClick={() => viewerRef.current?.openFullscreen()}
+                aria-label={t("aria.openFullscreen")}
+              >
+                <Maximize2 size={18} aria-hidden='true' />
+              </button>
             </nav>
           </div>
         ) : (
-          /* Desktop: Editor + Preview with splitter */
+          /* Desktop: Sidebar + Editor + Preview with nested splitters */
           <HorizontalSplitter
             left={
-              <div className={styles.editorPane}>
-                <MermaidEditor
-                  value={editorContent}
-                  onChange={handleEditorChange}
-                  error={snapshot.isError ? snapshot.errorMessage : null}
-                />
-              </div>
+              <aside className={styles.sidebar}>
+                {isFlowchart ? (
+                  <StepListEditor
+                    nodeIds={nodeIds}
+                    nodeLabels={nodeLabels}
+                    descriptions={descriptions}
+                    onDescriptionChange={handleDescriptionChange}
+                    isActive={snapshot.stepZoom.isActive}
+                    currentIndex={snapshot.stepZoom.currentIndex}
+                    onStepClick={handleStepClick}
+                    idPrefix='desktop-step'
+                  />
+                ) : null}
+              </aside>
             }
             right={
-              <div className={styles.viewerArea}>
-                <MermaidViewer
-                  definition={editorContent}
-                  id={`minimap-demo-${selectedDiagram.id}`}
-                  showControls={true}
-                  showMinimap={true}
-                  showFullscreenButton={true}
-                  onFullscreenChange={handleFullscreenChange}
-                  store={mermaidStore}
-                />
-              </div>
+              <HorizontalSplitter
+                left={
+                  <div className={styles.editorPane}>
+                    <MermaidEditor
+                      value={editorContent}
+                      onChange={handleEditorChange}
+                      error={snapshot.isError ? snapshot.errorMessage : null}
+                    />
+                  </div>
+                }
+                right={
+                  <div className={styles.viewerArea}>
+                    <MermaidViewer
+                      ref={viewerRef}
+                      definition={editorContent}
+                      id={`minimap-demo-${selectedDiagram.id}`}
+                      showControls={true}
+                      showMinimap={true}
+                      showFullscreenButton={true}
+                      onFullscreenChange={handleFullscreenChange}
+                      store={mermaidStore}
+                      stepDescriptions={descriptions}
+                    />
+                  </div>
+                }
+                initialRatio={0.4}
+              />
             }
-            initialRatio={0.4}
+            initialRatio={0.18}
+            minRatio={0.1}
+            maxRatio={0.35}
+            aria-label='Resize sidebar and content panels'
           />
         )}
-
-        {/* Diagram drawer - mobile only */}
-        <aside
-          className={styles.diagramDrawer}
-          data-drawer-open={isDiagramDrawerOpen ? "" : undefined}
-        >
-          <div className={styles.diagramDrawerHeader}>
-            <h2 className={styles.diagramDrawerTitle}>{t("drawer.selectDiagram")}</h2>
-            <button
-              type='button'
-              className={styles.drawerCloseBtn}
-              onClick={closeDiagramDrawer}
-              aria-label={t("drawer.closeDiagram")}
-            >
-              <X size={20} aria-hidden='true' />
-            </button>
-          </div>
-
-          <div className={styles.diagramDrawerContent}>
-            {SAMPLE_DIAGRAMS.map((diagram) => (
-              <button
-                key={diagram.id}
-                type='button'
-                className={styles.diagramOption}
-                data-selected={selectedDiagram.id === diagram.id ? "" : undefined}
-                onClick={() => handleDiagramSelectMobile(diagram)}
-              >
-                {t(diagram.nameKey)}
-              </button>
-            ))}
-          </div>
-        </aside>
       </main>
+
+      {/* Info drawer - mobile only */}
+      <BottomDrawer
+        open={isInfoDrawerOpen}
+        onClose={closeInfoDrawer}
+        aria-label={t("drawer.closeInfo")}
+      >
+        <BottomDrawerHeader>
+          <h2 className={styles.drawerTitle}>{t("drawer.info")}</h2>
+          <button
+            type='button'
+            className={styles.drawerCloseBtn}
+            onClick={closeInfoDrawer}
+            aria-label={t("drawer.closeInfo")}
+          >
+            <X size={20} aria-hidden='true' />
+          </button>
+        </BottomDrawerHeader>
+        <BottomDrawerBody>
+          {isFlowchart ? (
+            <StepListEditor
+              nodeIds={nodeIds}
+              nodeLabels={nodeLabels}
+              descriptions={descriptions}
+              onDescriptionChange={handleDescriptionChange}
+              isActive={snapshot.stepZoom.isActive}
+              currentIndex={snapshot.stepZoom.currentIndex}
+              onStepClick={handleStepClick}
+              idPrefix='mobile-step'
+            />
+          ) : null}
+        </BottomDrawerBody>
+      </BottomDrawer>
+
+      {/* Diagram drawer - mobile only */}
+      <BottomDrawer
+        open={isDiagramDrawerOpen}
+        onClose={closeDiagramDrawer}
+        aria-label={t("drawer.selectDiagram")}
+      >
+        <BottomDrawerHeader>
+          <h2 className={styles.drawerTitle}>{t("drawer.selectDiagram")}</h2>
+          <button
+            type='button'
+            className={styles.drawerCloseBtn}
+            onClick={closeDiagramDrawer}
+            aria-label={t("drawer.closeDiagram")}
+          >
+            <X size={20} aria-hidden='true' />
+          </button>
+        </BottomDrawerHeader>
+        <BottomDrawerBody>
+          <ToggleGroup
+            name='diagram-selector-mobile'
+            orientation='vertical'
+            items={diagramItems}
+            value={selectedDiagram.id}
+            onChange={(value) => {
+              const diagram = SAMPLE_DIAGRAMS.find((d) => d.id === value)
+              if (diagram) handleDiagramSelectMobile(diagram)
+            }}
+            aria-label={t("aria.diagramSelection")}
+          />
+        </BottomDrawerBody>
+      </BottomDrawer>
 
       {/* PWA Update Prompt */}
       <PWAUpdatePrompt />

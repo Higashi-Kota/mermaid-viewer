@@ -2,9 +2,8 @@
   "$schema": "https://json.schemastore.org/tsconfig",
   "extends": "@internal/shared-config/tsconfig/frontend/base",
   "compilerOptions": {
-    "noEmit": true,
-    "rootDir": "./src"
+    "noEmit": true
   },
-  "include": ["src/**/*"],
+  "include": ["src/**/*", "vitest.config.ts"],
   "exclude": ["node_modules"]
 }

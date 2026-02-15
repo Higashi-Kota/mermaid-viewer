@@ -1,0 +1,9 @@
+{
+  "primitive": {
+    "duration": {
+      "fast": { "value": "150ms" },
+      "normal": { "value": "200ms" },
+      "drawer": { "value": "350ms" }
+    }
+  }
+}

@@ -291,17 +291,21 @@ container-type: size;
 
 ### Token Categories
 
+Two-tier system: primitives (raw values) and semantics (contextual, theme-dependent).
+
 | Category | Prefix | Examples |
 |----------|--------|----------|
-| Colors | `--color-` | `--color-primary`, `--color-background`, `--color-border` |
-| Spacing | `--spacing-` | `--spacing-1`, `--spacing-2`, `--spacing-px` |
-| Size | `--size-` | `--size-icon-btn`, `--size-panel-min`, `--size-scrollbar` |
-| Z-Index | `--z-index-` | `--z-index-dropdown`, `--z-index-modal`, `--z-index-tooltip` |
-| Radius | `--radius-` | `--radius-sm`, `--radius-md`, `--radius-lg` |
-| Duration | `--duration-` | `--duration-fast`, `--duration-normal`, `--duration-slow` |
-| Easing | `--easing-` | `--easing-default`, `--easing-in-out`, `--easing-spring` |
-| Shadow | `--shadow-` | `--shadow-sm`, `--shadow-md`, `--shadow-lg` |
-| Font | `--font-` | `--font-family-sans`, `--font-weight-bold` |
+| Colors (semantic) | `--semantic-` | `--semantic-primary`, `--semantic-surface`, `--semantic-border` |
+| Colors (primitive) | `--primitive-color-` | `--primitive-color-blue-500`, `--primitive-color-gray-950` |
+| Spacing | `--primitive-space-` | `--primitive-space-2`, `--primitive-space-8` |
+| Size | `--primitive-size-` | `--primitive-size-target-min` |
+| Z-Index | `--primitive-z-` | `--primitive-z-controls`, `--primitive-z-fullscreen` |
+| Radius | `--primitive-radius-` | `--primitive-radius-sm`, `--primitive-radius-md` |
+| Duration | `--primitive-duration-` | `--primitive-duration-fast`, `--primitive-duration-normal` |
+| Shadow | `--semantic-shadow-` | `--semantic-shadow-sm`, `--semantic-shadow-float` |
+| Font | `--primitive-font-` | `--primitive-font-body`, `--primitive-font-mono` |
+| Text size | `--primitive-text-` | `--primitive-text-sm`, `--primitive-text-2xl` |
+| Weight | `--primitive-weight-` | `--primitive-weight-medium`, `--primitive-weight-bold` |
 
 ### Semantic vs Primitive Colors
 
@@ -320,13 +324,12 @@ container-type: size;
 ```
 
 **Semantic color examples:**
-- `--color-background` / `--color-foreground` (base)
-- `--color-card` / `--color-card-foreground`
-- `--color-popover` / `--color-popover-foreground`
-- `--color-primary` / `--color-primary-foreground`
-- `--color-muted` / `--color-muted-foreground`
-- `--color-destructive` / `--color-destructive-foreground`
-- `--color-border` / `--color-border-subtle`
+- `--semantic-surface` / `--semantic-surface-subtle` / `--semantic-surface-hover`
+- `--semantic-fg` / `--semantic-fg-muted`
+- `--semantic-primary` / `--semantic-primary-hover` / `--semantic-primary-active`
+- `--semantic-destructive` / `--semantic-destructive-subtle`
+- `--semantic-border` / `--semantic-border-subtle`
+- `--semantic-ring` / `--semantic-backdrop`
 
 ---
 
@@ -920,9 +923,9 @@ Descenders (`g`, `y`, `p`, `q`, `j`) clip when padding is less than border-radiu
 
 ### Before Committing CSS/TSX Changes
 
-- [ ] **No hardcoded px/rem values** - All sizes use `var(--space-*)`, `var(--size-*)` etc.
-- [ ] **No hardcoded colors** - All colors use semantic tokens like `var(--color-*)`
-- [ ] **No hardcoded z-index** - Use `var(--z-index-*)` tokens
+- [ ] **No hardcoded px/rem values** - All sizes use `var(--primitive-space-*)`, `var(--primitive-size-*)` etc.
+- [ ] **No hardcoded colors** - All colors use semantic tokens like `var(--semantic-*)`
+- [ ] **No hardcoded z-index** - Use `var(--primitive-z-*)` tokens
 - [ ] **No margin for spacing** - Use grid `gap` property for spacing between elements
 - [ ] **Grid-Only Layout** - **Flexbox is PROHIBITED.** All layouts must use CSS Grid.
 - [ ] **No unnecessary inline styles** - Move static dimensions to CSS classes
