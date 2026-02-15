@@ -224,10 +224,13 @@ export function MermaidViewer({
     if (!contentRef.current) return
 
     const updateSize = () => {
-      if (contentRef.current) {
-        const width = contentRef.current.clientWidth
-        const height = contentRef.current.clientHeight
-        store.updateViewportSize(width, height)
+      if (!contentRef.current) return
+      const width = contentRef.current.clientWidth
+      const height = contentRef.current.clientHeight
+      store.updateViewportSize(width, height)
+      // Initialize pan-zoom if not yet initialized (fallback for timing issues)
+      if (width > 0 && height > 0 && store.panZoom.initialTransform === null) {
+        store.initializePanZoom(width, height)
       }
     }
 
@@ -236,7 +239,7 @@ export function MermaidViewer({
     observer.observe(contentRef.current)
 
     return () => observer.disconnect()
-  }, [store])
+  }, [store, snapshot.svgContent])
 
   // Re-initialize pan-zoom when entering fullscreen (different viewport size)
   useEffect(() => {
