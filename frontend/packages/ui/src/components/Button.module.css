@@ -1,0 +1,117 @@
+/* Button component */
+
+.button {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: max-content;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  font-family: inherit;
+  font-weight: var(--primitive-weight-medium);
+  line-height: var(--primitive-leading-tight);
+  border-radius: var(--primitive-radius-md);
+  cursor: pointer;
+  touch-action: manipulation;
+  transition:
+    background-color var(--primitive-duration-fast) ease-out,
+    color var(--primitive-duration-fast) ease-out;
+}
+
+.button:focus-visible {
+  outline: 2px solid var(--semantic-ring);
+  outline-offset: 2px;
+}
+
+.button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* --- Variants --- */
+
+.primary {
+  background-color: var(--semantic-primary);
+  color: var(--primitive-color-white);
+}
+
+.primary:hover:not(:disabled) {
+  background-color: var(--semantic-primary-hover);
+}
+
+.primary:active:not(:disabled) {
+  background-color: var(--semantic-primary-active);
+}
+
+.secondary {
+  background-color: var(--semantic-surface);
+  color: var(--semantic-fg);
+  box-shadow: inset 0 0 0 1px var(--semantic-border);
+}
+
+.secondary:hover:not(:disabled) {
+  background-color: var(--semantic-surface-hover);
+}
+
+.ghost {
+  background-color: transparent;
+  color: var(--semantic-fg);
+}
+
+.ghost:hover:not(:disabled) {
+  background-color: var(--semantic-surface-hover);
+}
+
+.destructive {
+  background-color: var(--semantic-destructive);
+  color: var(--primitive-color-white);
+}
+
+.destructive:hover:not(:disabled) {
+  background-color: var(--semantic-destructive);
+  opacity: 0.9;
+}
+
+/* --- Sizes --- */
+
+.sm {
+  min-height: var(--primitive-size-target-min);
+  padding: var(--primitive-space-1) var(--primitive-space-6);
+  font-size: var(--primitive-text-sm);
+  gap: var(--primitive-space-2);
+}
+
+.md {
+  min-height: var(--primitive-size-target-min);
+  padding: var(--primitive-space-3) var(--primitive-space-8);
+  font-size: var(--primitive-text-sm);
+  gap: var(--primitive-space-3);
+}
+
+.lg {
+  min-height: var(--primitive-size-target-min);
+  padding: var(--primitive-space-4) var(--primitive-space-10);
+  font-size: var(--primitive-text-base);
+  gap: var(--primitive-space-4);
+}
+
+/* --- Icon --- */
+
+.icon {
+  display: grid;
+  place-items: center;
+}
+
+/* --- Label --- */
+
+.label {
+  white-space: nowrap;
+}
+
+/* --- Reduced motion --- */
+
+@media (prefers-reduced-motion: reduce) {
+  .button {
+    transition: none;
+  }
+}

@@ -104,6 +104,8 @@ export interface SvgDimensions {
  * MermaidViewer component props
  */
 export interface MermaidViewerProps {
+  /** Ref for imperative handle (React 19 ref-as-prop) */
+  readonly ref?: import("react").Ref<MermaidViewerHandle>
   /** Mermaid diagram definition */
   readonly definition: string
   /** Unique ID for the diagram */
@@ -116,6 +118,8 @@ export interface MermaidViewerProps {
   readonly showMinimap?: boolean
   /** Whether to show fullscreen button (default: true) */
   readonly showFullscreenButton?: boolean
+  /** Whether to show step zoom controls for flowchart diagrams (default: true) */
+  readonly showStepZoom?: boolean
   /** Callback when fullscreen state changes */
   readonly onFullscreenChange?: (isFullscreen: boolean) => void
   /** Zoom constraints */
@@ -125,6 +129,18 @@ export interface MermaidViewerProps {
    * Create with MermaidStore.create() at the parent component level.
    */
   readonly store: import("../store/MermaidStore").MermaidStore
+  /** Node ID → description mapping for step zoom overlay */
+  readonly stepDescriptions?: Record<string, string>
+}
+
+/**
+ * Imperative handle for MermaidViewer
+ */
+export interface MermaidViewerHandle {
+  /** 指定ステップへ移動（非アクティブ時は自動開始） */
+  goToStep: (index: number) => void
+  /** フルスクリーンモードを開く */
+  openFullscreen: () => void
 }
 
 /**
@@ -135,6 +151,8 @@ export interface ZoomControlsProps {
   readonly onZoomOut: () => void
   readonly onZoomReset: () => void
   readonly currentZoom: number
+  /** Callback to enter step zoom mode. When provided, a step zoom button is shown. */
+  readonly onEnterStepZoom?: () => void
   readonly className?: string
 }
 

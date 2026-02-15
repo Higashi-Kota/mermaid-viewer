@@ -58,50 +58,50 @@ export function MermaidEditor({
     const editorTheme = EditorView.theme({
       "&": {
         height: "100%",
-        fontSize: "var(--text-sm)",
+        fontSize: "var(--primitive-text-sm)",
       },
       "&.cm-focused": {
         outline: "none",
       },
       ".cm-scroller": {
-        fontFamily: "var(--font-mono)",
-        lineHeight: "var(--leading-relaxed)",
+        fontFamily: "var(--primitive-font-mono)",
+        lineHeight: "var(--primitive-leading-relaxed)",
       },
       ".cm-gutters": {
-        backgroundColor: "var(--editor-gutter-bg)",
-        borderRight: "1px solid var(--editor-gutter-border)",
-        color: "var(--editor-gutter-text)",
+        backgroundColor: "var(--semantic-editor-gutter-bg)",
+        borderRight: "1px solid var(--semantic-editor-gutter-border)",
+        color: "var(--semantic-editor-gutter-text)",
       },
       ".cm-lineNumbers .cm-gutterElement": {
-        minWidth: "var(--editor-line-number-width)",
+        minWidth: "var(--semantic-editor-line-number-width)",
         textAlign: "right",
         paddingRight: "0.5rem",
       },
       ".cm-activeLineGutter": {
-        backgroundColor: "var(--editor-active-line-bg)",
+        backgroundColor: "var(--semantic-editor-active-line)",
       },
       ".cm-content": {
-        caretColor: "var(--editor-caret-color)",
-        padding: "var(--space-2) 0",
+        caretColor: "var(--semantic-editor-caret)",
+        padding: "var(--primitive-space-2) 0",
       },
       ".cm-cursor": {
-        borderLeftColor: "var(--editor-caret-color)",
+        borderLeftColor: "var(--semantic-editor-caret)",
       },
       ".cm-dropCursor": {
-        borderLeftColor: "var(--editor-caret-color)",
+        borderLeftColor: "var(--semantic-editor-caret)",
       },
       ".cm-line": {
-        paddingLeft: "var(--space-2)",
-        paddingRight: "var(--space-2)",
+        paddingLeft: "var(--primitive-space-2)",
+        paddingRight: "var(--primitive-space-2)",
       },
       ".cm-activeLine": {
-        backgroundColor: "var(--editor-active-line-bg)",
+        backgroundColor: "var(--semantic-editor-active-line)",
       },
       ".cm-selectionBackground": {
-        backgroundColor: "var(--editor-selection-bg) !important",
+        backgroundColor: "var(--semantic-editor-selection) !important",
       },
       "&.cm-focused .cm-selectionBackground": {
-        backgroundColor: "var(--editor-selection-bg) !important",
+        backgroundColor: "var(--semantic-editor-selection) !important",
       },
     })
 

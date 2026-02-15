@@ -1,0 +1,82 @@
+/* RadioButton component */
+
+.label {
+  display: grid;
+  grid-template-columns: auto auto 1fr;
+  align-items: center;
+  gap: var(--primitive-space-3);
+  min-height: var(--primitive-size-target-min);
+  padding: var(--primitive-space-2) var(--primitive-space-3);
+  cursor: pointer;
+  border-radius: var(--primitive-radius-md);
+  transition: background-color var(--primitive-duration-fast) ease-out;
+}
+
+.label:hover {
+  background-color: var(--semantic-surface-hover);
+}
+
+.label:has(.input:disabled) {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Visually hide native input, keep accessible */
+.input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.input:focus-visible + .indicator {
+  outline: 2px solid var(--semantic-ring);
+  outline-offset: 2px;
+}
+
+/* Custom radio indicator */
+.indicator {
+  display: grid;
+  place-items: center;
+  width: 1.125rem;
+  height: 1.125rem;
+  border: 2px solid var(--semantic-border);
+  border-radius: 50%;
+  background-color: var(--semantic-surface);
+  transition:
+    border-color var(--primitive-duration-fast) ease-out,
+    background-color var(--primitive-duration-fast) ease-out;
+}
+
+.input:checked + .indicator {
+  border-color: var(--semantic-primary);
+  background-color: var(--semantic-primary);
+}
+
+.input:checked + .indicator::after {
+  content: "";
+  width: 0.375rem;
+  height: 0.375rem;
+  border-radius: 50%;
+  background-color: var(--primitive-color-white);
+}
+
+/* Label text */
+.text {
+  font-size: var(--primitive-text-sm);
+  font-weight: var(--primitive-weight-normal);
+  line-height: var(--primitive-leading-tight);
+  color: var(--semantic-fg);
+}
+
+/* --- Reduced motion --- */
+
+@media (prefers-reduced-motion: reduce) {
+  .label,
+  .indicator {
+    transition: none;
+  }
+}

@@ -1,0 +1,19 @@
+{
+  "semantic": {
+    "surface": { "value": "{primitive.color.white}" },
+    "surface-subtle": { "value": "{primitive.color.gray.50}" },
+    "surface-hover": { "value": "{primitive.color.gray.75}" },
+    "border": { "value": "{primitive.color.gray.300}" },
+    "border-subtle": { "value": "{primitive.color.gray.200}" },
+    "fg": { "value": "{primitive.color.gray.950}" },
+    "fg-muted": { "value": "{primitive.color.gray.600}" },
+    "primary": { "value": "{primitive.color.blue.500}" },
+    "primary-hover": { "value": "{primitive.color.blue.600}" },
+    "primary-active": { "value": "{primitive.color.blue.700}" },
+    "ring": { "value": "{primitive.color.blue.500}" },
+    "destructive": { "value": "{primitive.color.red.500}" },
+    "destructive-subtle": { "value": "{primitive.color.red.50}" },
+    "backdrop": { "value": "oklch(0 0 0 / 0.4)" },
+    "primary-alpha": { "value": "color-mix(in oklch, var(--semantic-primary) 20%, transparent)" }
+  }
+}

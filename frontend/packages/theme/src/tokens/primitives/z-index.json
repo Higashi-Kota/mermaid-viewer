@@ -1,0 +1,12 @@
+{
+  "primitive": {
+    "z": {
+      "controls": { "value": "10" },
+      "minimap": { "value": "10" },
+      "drawer-backdrop": { "value": "99" },
+      "drawer": { "value": "100" },
+      "toast": { "value": "200" },
+      "fullscreen": { "value": "300" }
+    }
+  }
+}

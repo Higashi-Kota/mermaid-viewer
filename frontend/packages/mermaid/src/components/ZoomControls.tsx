@@ -1,4 +1,4 @@
-import { Minus, Plus, RotateCcw } from "lucide-react"
+import { ListOrdered, Minus, Plus, RotateCcw } from "lucide-react"
 import type { ZoomControlsProps } from "../types"
 import styles from "./ZoomControls.module.css"
 
@@ -10,6 +10,7 @@ export function ZoomControls({
   onZoomOut,
   onZoomReset,
   currentZoom,
+  onEnterStepZoom,
   className = "",
 }: ZoomControlsProps) {
   const zoomPercentage = Math.round(currentZoom * 100)
@@ -49,6 +50,21 @@ export function ZoomControls({
       >
         <RotateCcw size={16} aria-hidden='true' />
       </button>
+
+      {onEnterStepZoom && (
+        <>
+          <div className={styles.divider} aria-hidden='true' />
+          <button
+            type='button'
+            onClick={onEnterStepZoom}
+            className={styles.btn}
+            aria-label='Start step zoom'
+            title='Start step zoom'
+          >
+            <ListOrdered size={16} aria-hidden='true' />
+          </button>
+        </>
+      )}
     </div>
   )
 }

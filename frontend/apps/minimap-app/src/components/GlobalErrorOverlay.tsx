@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react"
+import { useEffect, useState } from "react"
 import styles from "./ErrorFallback.module.css"
 import { buildErrorReport, copyTextToClipboard } from "./errorReporting"
 
@@ -34,10 +34,7 @@ export function GlobalErrorOverlay() {
     }
   }, [])
 
-  const report = useMemo(() => {
-    if (!state) return null
-    return buildErrorReport(state.error, { source: state.source })
-  }, [state])
+  const report = state ? buildErrorReport(state.error, { source: state.source }) : null
 
   const handleReload = () => {
     window.location.reload()

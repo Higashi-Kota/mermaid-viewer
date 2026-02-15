@@ -45,6 +45,7 @@ export const appMessages = {
   },
 
   // Mobile drawer
+  "drawer.info": { ja: "情報", en: "Info" },
   "drawer.selectDiagram": { ja: "図を選択", en: "Select Diagram" },
   "drawer.closeInfo": { ja: "情報パネルを閉じる", en: "Close info panel" },
   "drawer.closeDiagram": { ja: "図選択を閉じる", en: "Close diagram selector" },
@@ -54,6 +55,7 @@ export const appMessages = {
   "aria.selectDiagram": { ja: "図を選択", en: "Select diagram" },
   "aria.diagramSelection": { ja: "図の選択", en: "Diagram selection" },
   "aria.mobileNavigation": { ja: "モバイルナビゲーション", en: "Mobile navigation" },
+  "aria.openFullscreen": { ja: "フルスクリーンで表示", en: "Open fullscreen" },
 
   // Theme toggle
   "theme.toggle": { ja: "テーマ切替", en: "Toggle theme" },

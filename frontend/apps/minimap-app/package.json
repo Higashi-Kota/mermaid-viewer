@@ -7,9 +7,9 @@
     "dev": "concurrently \"tcm src --watch\" \"vite\"",
     "build": "vite build",
     "preview": "vite preview",
-    "typecheck": "tsc -p tsconfig.typecheck.json",
-    "css:types": "tcm src",
-    "css:types:watch": "tcm src --watch"
+    "typecheck": "tsgo -p tsconfig.typecheck.json",
+    "css:generate": "tcm src",
+    "css:generate:watch": "tcm src --watch"
   },
   "dependencies": {
     "@codemirror/commands": "^6.7.1",
@@ -17,6 +17,8 @@
     "@codemirror/view": "^6.35.0",
     "@mermaid-demo/i18n": "workspace:*",
     "@mermaid-demo/mermaid": "workspace:*",
+    "@mermaid-demo/ui": "workspace:*",
+    "@mermaid-demo/theme": "workspace:*",
     "@mermaid-demo/messages": "workspace:*",
     "lucide-react": "^0.563.0",
     "lz-string": "^1.5.0",

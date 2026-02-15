@@ -1,0 +1,19 @@
+{
+  "semantic": {
+    "editor": {
+      "gutter-bg": { "value": "{semantic.surface-subtle}" },
+      "gutter-border": { "value": "{semantic.border}" },
+      "gutter-text": { "value": "{semantic.fg-muted}" },
+      "line-number-width": { "value": "3.5rem" },
+      "caret": { "value": "{semantic.primary}" },
+      "selection": { "value": "oklch(from var(--semantic-primary) l c h / 0.2)" },
+      "active-line": { "value": "oklch(from var(--semantic-primary) l c h / 0.08)" },
+      "error-bg": { "value": "{semantic.destructive-subtle}" },
+      "error-border": { "value": "{semantic.destructive}" },
+      "error-text": { "value": "{semantic.destructive}" }
+    },
+    "editor-dark": {
+      "caret": { "value": "{primitive.color.near-white}" }
+    }
+  }
+}

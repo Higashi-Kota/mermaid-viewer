@@ -1,17 +1,21 @@
 import { Maximize2 } from "lucide-react"
 import mermaid from "mermaid"
-import { useEffect, useRef, useState } from "react"
+import { useEffect, useImperativeHandle, useRef, useState } from "react"
 
 import { exportPng, exportSvg, generateFilename } from "../core/export"
 // pinchGesture utilities used by PanZoomManager
 import { DEFAULT_ZOOM_CONSTRAINTS, toTransformCSS } from "../core/transform"
 import { parseSvgDimensions } from "../core/viewport"
+import { useStepZoom } from "../hooks/useStepZoom"
 import { useMermaidStore } from "../store/useMermaidStore"
 import type { MermaidViewerProps, SvgDimensions } from "../types"
 
 import { FullscreenOverlay } from "./FullscreenOverlay"
 import styles from "./MermaidViewer.module.css"
 import { Minimap } from "./Minimap"
+import { StepZoomCaption } from "./StepZoomCaption"
+import captionStyles from "./StepZoomCaption.module.css"
+import { StepZoomControls } from "./StepZoomControls"
 import { ZoomControls } from "./ZoomControls"
 
 /**
@@ -113,9 +117,12 @@ export function MermaidViewer({
   showControls = true,
   showMinimap = true,
   showFullscreenButton = true,
+  showStepZoom = true,
   onFullscreenChange,
   zoomConstraints = DEFAULT_ZOOM_CONSTRAINTS,
   store,
+  stepDescriptions,
+  ref,
 }: MermaidViewerProps) {
   // Refs
   const contentRef = useRef<HTMLDivElement>(null)
@@ -132,6 +139,15 @@ export function MermaidViewer({
 
   // Subscribe to store
   const snapshot = useMermaidStore(store)
+
+  // Step zoom hook
+  const stepZoom = useStepZoom(store, svgWrapperRef, definition)
+
+  // Imperative handle for external step navigation
+  useImperativeHandle(ref, () => ({
+    goToStep: stepZoom.goToStep,
+    openFullscreen,
+  }))
 
   // Detect theme from document
   const documentTheme = useDocumentTheme()
@@ -255,6 +271,9 @@ export function MermaidViewer({
   // Notify parent of fullscreen changes
   useEffect(() => {
     onFullscreenChange?.(snapshot.isFullscreen)
+    return () => {
+      onFullscreenChange?.(false)
+    }
   }, [snapshot.isFullscreen, onFullscreenChange])
 
   // Open fullscreen
@@ -308,6 +327,12 @@ export function MermaidViewer({
   // Store handler logic in refs (always access latest store/zoomConstraints)
   wheelHandlerRef.current = (event: WheelEvent) => {
     event.preventDefault()
+
+    // Cancel step zoom animation on manual interaction (stay in step zoom mode)
+    if (snapshot.stepZoom.isActive) {
+      stepZoom.cancelAnimation()
+    }
+
     const element = contentRef.current
     if (!element) return
 
@@ -321,6 +346,12 @@ export function MermaidViewer({
 
   fullscreenWheelHandlerRef.current = (event: WheelEvent) => {
     event.preventDefault()
+
+    // Cancel step zoom animation on manual interaction (stay in step zoom mode)
+    if (snapshot.stepZoom.isActive) {
+      stepZoom.cancelAnimation()
+    }
+
     const element = fullscreenContentRef.current
     if (!element) return
 
@@ -360,6 +391,11 @@ export function MermaidViewer({
     if (event.button !== 0 && event.pointerType === "mouse") return
     event.preventDefault()
     event.currentTarget.setPointerCapture(event.pointerId)
+
+    // Cancel step zoom animation on manual interaction (stay in step zoom mode)
+    if (snapshot.stepZoom.isActive) {
+      stepZoom.cancelAnimation()
+    }
 
     // Register pointer with screen coordinates
     activePointersRef.current.set(event.pointerId, {
@@ -458,6 +494,11 @@ export function MermaidViewer({
     event.preventDefault()
     event.currentTarget.setPointerCapture(event.pointerId)
 
+    // Cancel step zoom animation on manual interaction (stay in step zoom mode)
+    if (snapshot.stepZoom.isActive) {
+      stepZoom.cancelAnimation()
+    }
+
     // Register pointer with screen coordinates
     fullscreenActivePointersRef.current.set(event.pointerId, {
       x: event.clientX,
@@ -549,7 +590,7 @@ export function MermaidViewer({
     }
   }
 
-  // Export handlers (inline functions per project guidelines - NO useCallback)
+  // Export handlers
   function handleExportSvg() {
     if (snapshot.svgContent) {
       exportSvg(snapshot.svgContent, generateFilename("svg"))
@@ -619,14 +660,41 @@ export function MermaidViewer({
           />
         </div>
 
-        {/* Zoom controls */}
-        {showControls && (
-          <ZoomControls
-            onZoomIn={handleZoomIn}
-            onZoomOut={handleZoomOut}
-            onZoomReset={handleZoomReset}
-            currentZoom={transformState.zoom}
-          />
+        {/* Controls bar: StepZoomControls (when active) or ZoomControls (default) */}
+        {showControls &&
+          (snapshot.stepZoom.isActive && showStepZoom && stepZoom.isFlowchart ? (
+            <StepZoomControls
+              isActive={snapshot.stepZoom.isActive}
+              currentIndex={snapshot.stepZoom.currentIndex}
+              totalSteps={snapshot.stepZoom.totalSteps}
+              onNext={stepZoom.nextStep}
+              onPrevious={stepZoom.previousStep}
+              onExit={stepZoom.exitStepZoom}
+            />
+          ) : (
+            <ZoomControls
+              onZoomIn={handleZoomIn}
+              onZoomOut={handleZoomOut}
+              onZoomReset={handleZoomReset}
+              currentZoom={transformState.zoom}
+              onEnterStepZoom={
+                showStepZoom && stepZoom.isFlowchart ? stepZoom.enterStepZoom : undefined
+              }
+            />
+          ))}
+
+        {/* Step zoom caption overlay - top center */}
+        {showStepZoom && snapshot.stepZoom.isActive && stepZoom.isFlowchart && (
+          <div className={captionStyles.overlay}>
+            <StepZoomCaption
+              isActive
+              currentIndex={snapshot.stepZoom.currentIndex}
+              totalSteps={snapshot.stepZoom.totalSteps}
+              nodeId={snapshot.stepZoom.currentStep?.nodeId ?? null}
+              nodeLabels={stepZoom.nodeLabels}
+              descriptions={stepDescriptions}
+            />
+          </div>
         )}
 
         {/* Minimap */}
@@ -686,13 +754,40 @@ export function MermaidViewer({
           />
         </div>
 
-        {showControls && (
-          <ZoomControls
-            onZoomIn={handleFullscreenZoomIn}
-            onZoomOut={handleFullscreenZoomOut}
-            onZoomReset={handleZoomReset}
-            currentZoom={transformState.zoom}
-          />
+        {showControls &&
+          (snapshot.stepZoom.isActive && showStepZoom && stepZoom.isFlowchart ? (
+            <StepZoomControls
+              isActive={snapshot.stepZoom.isActive}
+              currentIndex={snapshot.stepZoom.currentIndex}
+              totalSteps={snapshot.stepZoom.totalSteps}
+              onNext={stepZoom.nextStep}
+              onPrevious={stepZoom.previousStep}
+              onExit={stepZoom.exitStepZoom}
+            />
+          ) : (
+            <ZoomControls
+              onZoomIn={handleFullscreenZoomIn}
+              onZoomOut={handleFullscreenZoomOut}
+              onZoomReset={handleZoomReset}
+              currentZoom={transformState.zoom}
+              onEnterStepZoom={
+                showStepZoom && stepZoom.isFlowchart ? stepZoom.enterStepZoom : undefined
+              }
+            />
+          ))}
+
+        {/* Step zoom caption overlay - fullscreen top center */}
+        {showStepZoom && snapshot.stepZoom.isActive && stepZoom.isFlowchart && (
+          <div className={captionStyles.overlay}>
+            <StepZoomCaption
+              isActive
+              currentIndex={snapshot.stepZoom.currentIndex}
+              totalSteps={snapshot.stepZoom.totalSteps}
+              nodeId={snapshot.stepZoom.currentStep?.nodeId ?? null}
+              nodeLabels={stepZoom.nodeLabels}
+              descriptions={stepDescriptions}
+            />
+          </div>
         )}
 
         {showMinimap && svgContent && svgDimensions && (

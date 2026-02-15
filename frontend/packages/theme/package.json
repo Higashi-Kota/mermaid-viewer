@@ -1,0 +1,29 @@
+{
+  "name": "@mermaid-demo/theme",
+  "version": "0.0.1",
+  "private": true,
+  "type": "module",
+  "exports": {
+    "./tokens.css": "./src/generated/tokens.css",
+    "./base/reset.css": "./src/base/reset.css",
+    "./base/global.css": "./src/base/global.css"
+  },
+  "sideEffects": [
+    "**/*.css"
+  ],
+  "scripts": {
+    "typecheck": "tsgo -p tsconfig.typecheck.json",
+    "build": "tsx src/build.ts",
+    "css:generate": "tsx src/build.ts",
+    "css:watch": "tsx src/watch.ts"
+  },
+  "devDependencies": {
+    "@internal/shared-config": "workspace:*",
+    "@types/node": "^25.0.10",
+    "@typescript/native-preview": "^7.0.0-dev.20260122.4",
+    "chokidar": "^5.0.0",
+    "style-dictionary": "^4.2.0",
+    "tsx": "^4.19.2",
+    "typescript": "^5.9.3"
+  }
+}

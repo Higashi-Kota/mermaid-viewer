@@ -1,0 +1,16 @@
+body {
+  font-family: var(--primitive-font-body);
+  font-size: var(--primitive-text-base);
+  line-height: 1.5;
+  color: var(--semantic-fg);
+  background-color: var(--semantic-surface);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+/* Scrollbar — thin, theme-aware via semantic tokens */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--semantic-border) transparent;
+}

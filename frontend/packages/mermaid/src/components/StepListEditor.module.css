@@ -1,0 +1,139 @@
+/* StepListEditor - Sidebar step list with description editing */
+
+.container {
+  display: grid;
+  grid-template-rows: auto 1fr;
+  gap: var(--primitive-space-4);
+  height: 100%;
+  overflow: hidden;
+}
+
+.heading {
+  font-size: var(--primitive-text-xs);
+  font-weight: var(--primitive-weight-semibold);
+  letter-spacing: var(--primitive-tracking-wide);
+  text-transform: uppercase;
+  color: var(--semantic-fg-muted);
+  padding: 0 var(--primitive-space-2);
+  margin: 0;
+}
+
+.list {
+  display: grid;
+  gap: var(--primitive-space-3);
+  align-content: start;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  padding: var(--primitive-space-4);
+}
+
+.item {
+  display: grid;
+  gap: var(--primitive-space-2);
+  padding: var(--primitive-space-3);
+  border: 1px solid var(--semantic-border-subtle);
+  border-radius: var(--primitive-radius-sm);
+  background-color: var(--semantic-surface);
+  transition: border-color var(--primitive-duration-fast);
+}
+
+.item[data-current] {
+  border-color: var(--semantic-primary);
+  background-color: var(--semantic-surface-subtle);
+}
+
+.stepHeader {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: var(--primitive-space-3);
+  align-items: center;
+  min-height: var(--primitive-size-target-min);
+  padding: var(--primitive-space-2);
+  border: none;
+  border-radius: var(--primitive-radius-sm);
+  background-color: transparent;
+  color: var(--semantic-fg);
+  cursor: pointer;
+  touch-action: manipulation;
+  text-align: left;
+  transition: background-color var(--primitive-duration-fast);
+}
+
+.stepHeader:hover {
+  background-color: var(--semantic-surface-hover);
+}
+
+.stepHeader:focus-visible {
+  outline: 2px solid var(--semantic-ring);
+  outline-offset: 2px;
+}
+
+.stepNumber {
+  display: grid;
+  place-items: center;
+  width: var(--primitive-space-12);
+  height: var(--primitive-space-12);
+  border-radius: 50%;
+  background-color: var(--semantic-surface-hover);
+  font-size: var(--primitive-text-xs);
+  font-weight: var(--primitive-weight-semibold);
+  font-variant-numeric: tabular-nums;
+  color: var(--semantic-fg-muted);
+}
+
+.item[data-current] .stepNumber {
+  background-color: var(--semantic-primary);
+  color: var(--primitive-color-white);
+}
+
+.stepLabel {
+  font-size: var(--primitive-text-sm);
+  font-weight: var(--primitive-weight-medium);
+  line-height: var(--primitive-leading-tight);
+  color: var(--semantic-fg);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.descriptionInput {
+  display: block;
+  width: 100%;
+  min-height: var(--primitive-size-target-min);
+  padding: var(--primitive-space-3) var(--primitive-space-4);
+  border: 1px solid var(--semantic-border-subtle);
+  border-radius: var(--primitive-radius-sm);
+  background-color: var(--semantic-surface);
+  color: var(--semantic-fg);
+  font-family: inherit;
+  font-size: var(--primitive-text-xs);
+  line-height: var(--primitive-leading-normal);
+  resize: vertical;
+  transition: border-color var(--primitive-duration-fast);
+}
+
+.descriptionInput::placeholder {
+  color: var(--semantic-fg-muted);
+  opacity: 0.6;
+}
+
+.descriptionInput:focus-visible {
+  outline: 2px solid var(--semantic-ring);
+  outline-offset: 2px;
+  border-color: var(--semantic-primary);
+}
+
+.charCount {
+  font-size: var(--primitive-text-xs);
+  color: var(--semantic-fg-muted);
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .item,
+  .stepHeader,
+  .descriptionInput {
+    transition: none;
+  }
+}

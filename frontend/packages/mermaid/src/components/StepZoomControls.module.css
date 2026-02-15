@@ -1,0 +1,77 @@
+/* StepZoomControls CSS Module */
+
+/* Controls container - positioned above ZoomControls */
+.controls {
+  position: absolute;
+  bottom: var(--primitive-space-6, 12px);
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: var(--primitive-z-controls, 10);
+  display: grid;
+  grid-auto-flow: column;
+  align-items: center;
+  gap: var(--primitive-space-2, 4px);
+  background-color: var(--semantic-surface);
+  border: 1px solid var(--semantic-border);
+  border-radius: var(--primitive-radius-md);
+  padding: var(--primitive-space-2, 4px) var(--primitive-space-4, 8px);
+  box-shadow: var(--semantic-shadow-float);
+}
+
+/* Navigation button - WCAG 2.5.5 AAA touch target */
+.btn {
+  display: grid;
+  place-items: center;
+  min-width: var(--primitive-size-target-min, 44px);
+  min-height: var(--primitive-size-target-min, 44px);
+  border: none;
+  border-radius: var(--primitive-radius-sm);
+  background-color: transparent;
+  color: var(--semantic-fg);
+  cursor: pointer;
+  touch-action: manipulation;
+  transition: background-color var(--primitive-duration-fast, 150ms);
+}
+
+.btn:hover:not(:disabled) {
+  background-color: var(--semantic-surface-hover);
+}
+
+.btn:focus-visible {
+  outline: 2px solid var(--semantic-ring);
+  outline-offset: -2px;
+}
+
+.btn:active:not(:disabled) {
+  background-color: var(--semantic-surface-hover);
+}
+
+.btn:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
+/* Step counter display */
+.counter {
+  min-width: 48px;
+  text-align: center;
+  font-size: var(--primitive-text-sm, 12px);
+  color: var(--semantic-fg-muted);
+  user-select: none;
+  padding: 0 var(--primitive-space-2, 4px);
+  font-variant-numeric: tabular-nums;
+}
+
+/* Divider between nav buttons and exit */
+.divider {
+  width: 1px;
+  height: 20px;
+  background-color: var(--semantic-border);
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .btn {
+    transition: none;
+  }
+}

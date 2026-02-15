@@ -1,0 +1,8 @@
+{
+  "extends": "@internal/shared-config/tsconfig/frontend/base",
+  "compilerOptions": {
+    "rootDir": "src",
+    "outDir": "dist"
+  },
+  "include": ["src"]
+}

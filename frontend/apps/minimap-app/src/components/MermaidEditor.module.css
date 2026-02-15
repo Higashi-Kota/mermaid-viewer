@@ -5,8 +5,8 @@
   display: grid;
   grid-template-rows: auto 1fr;
   overflow: hidden;
-  background-color: var(--mermaid-color-surface);
-  border-radius: var(--mermaid-radius-sm);
+  background-color: var(--semantic-surface);
+  border-radius: var(--primitive-radius-sm);
 }
 
 .editorRoot {
@@ -17,12 +17,12 @@
 
 /* Error Banner */
 .errorBanner {
-  padding: var(--space-3) var(--space-4);
-  background-color: var(--editor-error-bg);
-  border-bottom: 1px solid var(--editor-error-border);
-  color: var(--editor-error-text);
-  font-size: var(--text-xs);
-  font-family: var(--font-mono);
+  padding: var(--primitive-space-3) var(--primitive-space-4);
+  background-color: var(--semantic-editor-error-bg);
+  border-bottom: 1px solid var(--semantic-editor-error-border);
+  color: var(--semantic-editor-error-text);
+  font-size: var(--primitive-text-xs);
+  font-family: var(--primitive-font-mono);
   white-space: pre-wrap;
   word-break: break-word;
 }

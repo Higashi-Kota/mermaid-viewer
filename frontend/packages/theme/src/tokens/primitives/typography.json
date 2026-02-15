@@ -1,0 +1,34 @@
+{
+  "primitive": {
+    "font": {
+      "display": { "value": "\"Manrope\", system-ui, sans-serif" },
+      "body": { "value": "\"Source Sans 3\", system-ui, sans-serif" },
+      "mono": { "value": "\"JetBrains Mono\", ui-monospace, monospace" }
+    },
+    "text": {
+      "xs": { "value": "0.6875rem" },
+      "sm": { "value": "0.75rem" },
+      "base": { "value": "0.8125rem" },
+      "md": { "value": "0.875rem" },
+      "lg": { "value": "1rem" },
+      "xl": { "value": "1.125rem" },
+      "2xl": { "value": "1.25rem" }
+    },
+    "weight": {
+      "normal": { "value": "400" },
+      "medium": { "value": "500" },
+      "semibold": { "value": "600" },
+      "bold": { "value": "700" }
+    },
+    "leading": {
+      "tight": { "value": "1.25" },
+      "normal": { "value": "1.5" },
+      "relaxed": { "value": "1.625" }
+    },
+    "tracking": {
+      "tight": { "value": "-0.02em" },
+      "normal": { "value": "0" },
+      "wide": { "value": "0.025em" }
+    }
+  }
+}

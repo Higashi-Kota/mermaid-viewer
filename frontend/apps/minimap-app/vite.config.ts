@@ -96,12 +96,24 @@ export default defineConfig({
       ...(isDev
         ? [
             {
-              find: "@mermaid-demo/mermaid/styles",
-              replacement: resolve(__dirname, "../../packages/mermaid/src/styles/tokens.css"),
+              find: "@mermaid-demo/theme/tokens.css",
+              replacement: resolve(__dirname, "../../packages/theme/src/generated/tokens.css"),
+            },
+            {
+              find: "@mermaid-demo/theme/base/reset.css",
+              replacement: resolve(__dirname, "../../packages/theme/src/base/reset.css"),
+            },
+            {
+              find: "@mermaid-demo/theme/base/global.css",
+              replacement: resolve(__dirname, "../../packages/theme/src/base/global.css"),
             },
             {
               find: "@mermaid-demo/mermaid",
               replacement: resolve(__dirname, "../../packages/mermaid/src"),
+            },
+            {
+              find: "@mermaid-demo/ui",
+              replacement: resolve(__dirname, "../../packages/ui/src"),
             },
           ]
         : []),
